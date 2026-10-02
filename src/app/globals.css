@@ -1,0 +1,229 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  /* Pi brand tokens */
+  --color-pi-gold: var(--pi-gold);
+  --color-pi-gold-soft: var(--pi-gold-soft);
+  --color-pi-purple: var(--pi-purple);
+  --color-pi-purple-soft: var(--pi-purple-soft);
+  --color-pi-teal: var(--pi-teal);
+  --color-pi-rose: var(--pi-rose);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Light: warm cream paper with deep plum ink + gold accents */
+  --background: oklch(0.985 0.012 95);
+  --foreground: oklch(0.22 0.04 295);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.04 295);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 295);
+  --primary: oklch(0.32 0.13 295);
+  --primary-foreground: oklch(0.985 0.01 95);
+  --secondary: oklch(0.96 0.02 95);
+  --secondary-foreground: oklch(0.28 0.05 295);
+  --muted: oklch(0.96 0.015 95);
+  --muted-foreground: oklch(0.5 0.03 295);
+  --accent: oklch(0.94 0.04 95);
+  --accent-foreground: oklch(0.28 0.06 295);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.02 95);
+  --input: oklch(0.92 0.02 95);
+  --ring: oklch(0.7 0.13 80);
+  --chart-1: oklch(0.74 0.16 80);
+  --chart-2: oklch(0.5 0.18 295);
+  --chart-3: oklch(0.62 0.13 195);
+  --chart-4: oklch(0.65 0.2 350);
+  --chart-5: oklch(0.78 0.15 145);
+  --sidebar: oklch(0.985 0.01 95);
+  --sidebar-foreground: oklch(0.22 0.04 295);
+  --sidebar-primary: oklch(0.32 0.13 295);
+  --sidebar-primary-foreground: oklch(0.985 0.01 95);
+  --sidebar-accent: oklch(0.94 0.04 95);
+  --sidebar-accent-foreground: oklch(0.28 0.06 295);
+  --sidebar-border: oklch(0.9 0.02 95);
+  --sidebar-ring: oklch(0.7 0.13 80);
+  /* Pi brand */
+  --pi-gold: oklch(0.82 0.15 85);
+  --pi-gold-soft: oklch(0.95 0.05 90);
+  --pi-purple: oklch(0.5 0.2 295);
+  --pi-purple-soft: oklch(0.93 0.04 295);
+  --pi-teal: oklch(0.62 0.13 195);
+  --pi-rose: oklch(0.65 0.2 350);
+}
+
+.dark {
+  /* Dark: midnight plum with gold + electric purple accents */
+  --background: oklch(0.16 0.03 295);
+  --foreground: oklch(0.96 0.015 95);
+  --card: oklch(0.2 0.035 295);
+  --card-foreground: oklch(0.96 0.015 95);
+  --popover: oklch(0.2 0.035 295);
+  --popover-foreground: oklch(0.96 0.015 95);
+  --primary: oklch(0.83 0.15 85);
+  --primary-foreground: oklch(0.18 0.04 295);
+  --secondary: oklch(0.25 0.04 295);
+  --secondary-foreground: oklch(0.96 0.015 95);
+  --muted: oklch(0.25 0.03 295);
+  --muted-foreground: oklch(0.7 0.03 295);
+  --accent: oklch(0.3 0.07 295);
+  --accent-foreground: oklch(0.96 0.015 95);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.83 0.15 85);
+  --chart-1: oklch(0.83 0.15 85);
+  --chart-2: oklch(0.6 0.2 295);
+  --chart-3: oklch(0.62 0.13 195);
+  --chart-4: oklch(0.65 0.2 350);
+  --chart-5: oklch(0.72 0.15 145);
+  --sidebar: oklch(0.16 0.03 295);
+  --sidebar-foreground: oklch(0.96 0.015 95);
+  --sidebar-primary: oklch(0.83 0.15 85);
+  --sidebar-primary-foreground: oklch(0.18 0.04 295);
+  --sidebar-accent: oklch(0.3 0.07 295);
+  --sidebar-accent-foreground: oklch(0.96 0.015 95);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.83 0.15 85);
+  /* Pi brand (dark) */
+  --pi-gold: oklch(0.85 0.16 85);
+  --pi-gold-soft: oklch(0.3 0.06 60);
+  --pi-purple: oklch(0.62 0.22 295);
+  --pi-purple-soft: oklch(0.3 0.08 295);
+  --pi-teal: oklch(0.62 0.13 195);
+  --pi-rose: oklch(0.68 0.2 350);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---------- Pi Network utility flourishes ---------- */
+
+.pi-grid-bg {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+}
+
+.pi-radial {
+  background:
+    radial-gradient(60% 50% at 50% -10%, color-mix(in oklab, var(--pi-gold) 22%, transparent), transparent 70%),
+    radial-gradient(50% 40% at 90% 10%, color-mix(in oklab, var(--pi-purple) 18%, transparent), transparent 70%);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(110deg, var(--pi-gold) 0%, var(--pi-purple) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(110deg, var(--pi-purple) 0%, var(--pi-gold) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass-card {
+  background: color-mix(in oklab, var(--card) 75%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+}
+
+.gold-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--pi-gold) 30%, transparent),
+    0 18px 50px -12px color-mix(in oklab, var(--pi-gold) 45%, transparent);
+}
+
+/* Slow orbiting glow used behind the hero Pi mark */
+@keyframes pi-orbit {
+  0% { transform: rotate(0deg) translateX(0); }
+  50% { transform: rotate(180deg) translateX(6px); }
+  100% { transform: rotate(360deg) translateX(0); }
+}
+.animate-pi-orbit { animation: pi-orbit 18s linear infinite; }
+
+@keyframes pi-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-pi-float { animation: pi-float 6s ease-in-out infinite; }
+
+@keyframes pi-pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.animate-pi-ring { animation: pi-pulse-ring 3s ease-out infinite; }
+
+/* Marquee for the partner / ticker tape */
+@keyframes pi-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-pi-marquee { animation: pi-marquee 32s linear infinite; }
+
+/* Custom scrollbar for long lists */
+.pi-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.pi-scroll::-webkit-scrollbar-track { background: transparent; }
+.pi-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--pi-gold) 45%, transparent);
+  border-radius: 999px;
+}
+.pi-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--pi-gold) 70%, transparent);
+}

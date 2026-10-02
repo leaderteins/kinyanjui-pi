@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// A domain in the owner's Pi Network portfolio
+model Domain {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. "kinyanjui.pi"
+  label       String   // e.g. "kinyanjui"
+  tagline    String   // short marketing tagline
+  description String   // longer description of intended use
+  category    String   // personal | business | community | marketplace | defi | nft | utility
+  status      String   @default("held") // held | developed | for-sale | auction
+  pricePi     Float?   // asking price in Pi (if for sale)
+  featured    Boolean  @default(false)
+  emoji       String   @default("π")
+  accent      String   @default("gold") // gold | purple | teal | rose
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Contact / inquiry form submissions
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  domain    String?  // which domain they're interested in
+  intent    String   @default("general") // general | purchase | partnership | develop
+  budget    String?
+  message   String
+  status    String   @default("new") // new | read | replied | closed
+  createdAt DateTime @default(now())
+}
+
+// Newsletter subscribers
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  piHandle  String?
+  createdAt DateTime @default(now())
+}
+
+// Pi price ticker log entries (simulated market data)
+model PiPriceLog {
+  id        String   @id @default(cuid())
+  priceUsd  Float
+  change24h Float
+  volumeUsd Float
+  marketCap Float
+  createdAt DateTime @default(now())
+}
