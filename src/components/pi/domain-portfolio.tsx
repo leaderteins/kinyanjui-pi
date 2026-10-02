@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useSpring,
+} from "framer-motion";
 import {
   Eye,
   Tag,
@@ -9,6 +14,7 @@ import {
   Sparkles,
   Filter,
   ChevronRight,
+  HandCoins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +35,7 @@ import {
 } from "@/lib/pi";
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
+import { MakeOfferModal } from "./make-offer-modal";
 
 const CATEGORIES = [
   { value: "all", label: "All" },
@@ -166,6 +173,30 @@ function DomainCard({
   const statusLabel = STATUS_LABELS[domain.status] ?? domain.status;
   const catLabel = CATEGORY_LABELS[domain.category] ?? domain.category;
 
+  // 3D tilt + cursor-follow glow
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const rotateX = useSpring(useTransform(my, [0, 1], [6, -6]), {
+    stiffness: 150,
+    damping: 18,
+  });
+  const rotateY = useSpring(useTransform(mx, [0, 1], [-6, 6]), {
+    stiffness: 150,
+    damping: 18,
+  });
+  const glowX = useTransform(mx, [0, 1], ["0%", "100%"]);
+  const glowY = useTransform(my, [0, 1], ["0%", "100%"]);
+
+  function onMove(e: React.MouseEvent<HTMLButtonElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width);
+    my.set((e.clientY - rect.top) / rect.height);
+  }
+  function onLeave() {
+    mx.set(0.5);
+    my.set(0.5);
+  }
+
   return (
     <motion.button
       initial={{ opacity: 0, y: 20 }}
@@ -173,8 +204,27 @@ function DomainCard({
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.06 }}
       onClick={onOpen}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${accent.border} bg-card/60 p-5 text-left backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-xl`}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 800,
+      }}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${accent.border} bg-card/60 p-5 text-left backdrop-blur-sm transition-shadow hover:shadow-xl`}
     >
+      {/* cursor-follow glow */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: useTransform(
+            [glowX, glowY],
+            ([gx, gy]) =>
+              `radial-gradient(180px circle at ${gx} ${gy}, color-mix(in oklab, var(--pi-gold) 22%, transparent), transparent 60%)`
+          ),
+        }}
+      />
       {/* accent wash */}
       <div
         className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${accent.from} ${accent.to} blur-2xl opacity-60 transition-opacity group-hover:opacity-100`}
@@ -245,11 +295,21 @@ function DomainDialog({
   onClose: () => void;
 }) {
   const { toast: legacyToast } = useToast();
+  const [offerOpen, setOfferOpen] = React.useState(false);
   const accent = domain
     ? ACCENT_STYLES[domain.accent] ?? ACCENT_STYLES.gold
     : ACCENT_STYLES.gold;
 
+  // The domain reference held for the offer modal — keep it even after the
+  // detail dialog closes so the offer success screen can finish animating.
+  const [offerDomain, setOfferDomain] = React.useState<PiDomain | null>(null);
+
+  React.useEffect(() => {
+    if (domain) setOfferDomain(domain);
+  }, [domain]);
+
   return (
+    <>
     <Dialog open={!!domain} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg overflow-hidden p-0">
         {domain && (
@@ -314,9 +374,10 @@ function DomainDialog({
                 </div>
               </div>
 
-              <DialogFooter className="gap-2 sm:gap-2">
+              <DialogFooter className="flex-col gap-2 sm:flex-row sm:gap-2">
                 <Button
                   variant="outline"
+                  className="sm:flex-1"
                   onClick={() => {
                     navigator.clipboard?.writeText(domain.name);
                     toast.success(`Copied ${domain.name}`);
@@ -325,11 +386,12 @@ function DomainDialog({
                   Copy name
                 </Button>
                 <Button
-                  className="gap-1.5 bg-gradient-to-r from-pi-gold to-pi-purple text-primary-foreground"
+                  variant="outline"
+                  className="sm:flex-1 gap-1.5"
                   onClick={() => {
                     legacyToast({
                       title: "Inquiry started",
-                      description: `Scroll to the contact form to send your offer for ${domain.name}.`,
+                      description: `Scroll to the contact form to send your message about ${domain.name}.`,
                     });
                     onClose();
                     setTimeout(() => {
@@ -342,11 +404,33 @@ function DomainDialog({
                   Inquire
                   <ChevronRight className="h-4 w-4" />
                 </Button>
+                <Button
+                  className="sm:flex-1 gap-1.5 bg-gradient-to-r from-pi-gold to-pi-purple text-primary-foreground shadow-lg shadow-pi-gold/20"
+                  onClick={() => setOfferOpen(true)}
+                >
+                  <HandCoins className="h-4 w-4" />
+                  Make an offer
+                </Button>
               </DialogFooter>
             </div>
           </>
         )}
       </DialogContent>
     </Dialog>
+
+    <MakeOfferModal
+      domain={offerDomain}
+      open={offerOpen}
+      onOpenChange={(o) => {
+        setOfferOpen(o);
+        if (!o) {
+          // close the detail dialog too after a successful offer
+          setTimeout(() => {
+            if (offerDomain) onClose();
+          }, 250);
+        }
+      }}
+    />
+    </>
   );
 }

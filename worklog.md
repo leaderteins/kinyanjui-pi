@@ -52,3 +52,74 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - Domain "views" counter is currently only incremented client-side on detail open; could be made more robust with debounce/dedup later.
 - Next-step feature ideas: admin view for inquiries/subscribers, individual domain landing pages (/domains/[name]), a "make an offer" flow with Pi amount stepper, Pi wallet connect integration, testimonials/pioneer spotlight, blog for ecosystem news, animated hero background canvas.
 - The recurring webDevReview cron (every 15 min) will independently reassess and continue advancing the project.
+
+---
+Task ID: 2
+Agent: main (Z.ai Code) — webDevReview cron round 1
+Task: QA the existing site, fix bugs, then add new features and improve styling detail.
+
+Work Log:
+- Reviewed worklog (Task ID 1) — site was stable with 8 domains, 6 sections, working lookup/contact/newsletter.
+- QA via agent-browser: page loaded, no console/runtime errors; dev log clean.
+- Lint clean (pre-existing).
+- Identified and fixed a real bug in the new make-offer flow during testing (see below).
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Market data chart (src/components/pi/market-chart.tsx):
+   - Full interactive Recharts ComposedChart with Area + Bar.
+   - Metric toggle: Price / Volume / Market Cap.
+   - Period toggle: 7D / 14D / 30D (client-side slice of server-fetched series).
+   - Stat row: period high/low, 24h volume, market cap.
+   - Pi-branded tooltip, gradient fills, grid styling.
+2. Make-an-offer modal (src/components/pi/make-offer-modal.tsx):
+   - Pi amount stepper (+/- buttons, 250 step), numeric input, quick-amount chips (500/1k/2.5k/5k/10k).
+   - Live "vs asking" comparison (diff in π and %).
+   - Name/email/message fields, validated, submits to /api/inquiries with intent="purchase" and budget="<amount> π".
+   - Animated success state with spring check icon; closes detail dialog after.
+   - Wired into the domain detail Dialog as a third primary CTA ("Make an offer").
+3. Pioneer spotlight (src/components/pi/pioneer-spotlight.tsx):
+   - Embla carousel of 5 pioneer testimonials with avatars, Pi handles, roles, star ratings, quotes.
+   - Prev/next buttons, auto-advance every 6.5s, animated dot indicators.
+4. Ecosystem pulse (src/components/pi/ecosystem-pulse.tsx) + GET /api/activity:
+   - Live "recent activity" feed from real DB inquiries (anonymized first name + verb + target + relative time).
+   - Mini stats: subscriber count, total domain views.
+   - "Most viewed" domains leaderboard with accent dots.
+   - Auto-refreshes every 30s; loading skeletons; empty state.
+5. Scroll progress bar (src/components/pi/scroll-progress.tsx):
+   - Fixed top gradient bar using framer-motion useScroll + useSpring.
+6. Animated hero starfield (src/components/pi/starfield-canvas.tsx):
+   - Canvas-based gold/purple twinkling particles that drift upward; respects prefers-reduced-motion and DPR; auto-resizes.
+7. 3D tilt + cursor-follow glow on domain cards (domain-portfolio.tsx):
+   - useMotionValue/useTransform/useSpring for rotateX/rotateY on mouse move; radial glow that follows cursor.
+
+Styling improvements:
+- New "market data", "voices from the network", and "ecosystem pulse" section headers with branded badges.
+- Refined domain dialog footer (3 CTAs: Copy name / Inquire / Make an offer).
+- Better card hover (tilt + glow instead of plain translate).
+- Scroll progress indicator across the whole page.
+
+Bug found and fixed during QA:
+- make-offer-modal.tsx had `step={STEP}` (250) on the numeric offer input, but domain asking prices (e.g. 9200 π) are not multiples of 250 → HTML5 constraint validation blocked form submission silently (no submit event fired, no fetch, no toast). Fixed by removing `step` from the input so any integer ≥ 0 is valid; the +/- buttons still snap to 250 increments.
+- Also fixed an initial `?? ||` mixing parse error in the same component's useEffect.
+
+Verification (agent-browser):
+- Page reloads clean, no console/runtime errors.
+- Market chart: Price/Volume/Market Cap toggles + 7D/14D/30D toggles all work; screenshots taken.
+- Pioneer carousel: next/prev buttons advance slides; dots update; no errors.
+- Ecosystem pulse: renders live activity ("John made an offer on piwallet.pi", "Jane inquired about the portfolio"), subscriber count, total views, most-viewed leaderboard; /api/activity returns 200.
+- Make-an-offer flow (piwallet.pi): opened dialog → "Make an offer" → filled name/email → "Submit offer of 9,200 π" → POST /api/inquiries 200 → "Offer submitted!" success screen + toast. Verified DB row: { name:"John Builder", email:"john@builder.com", domain:"piwallet.pi", intent:"purchase", budget:"9,200 π", message:"Offering 9,200 π for piwallet.pi." }.
+- Mobile (iPhone 14): full-page screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new major sections added (Market chart, Pioneer spotlight, Ecosystem pulse, Make-an-offer modal) + scroll progress bar + hero starfield + 3D card tilt.
+- 1 new API endpoint (/api/activity) + extended page.tsx to pass full price series.
+- 1 real bug fixed (HTML5 step validation silently blocking the offer form).
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- Pi price data is still simulated/illustrative — recommend a manual admin update endpoint (POST /api/pi-stats) or a scheduled price-log writer so the chart reflects "fresh" data over time.
+- The activity feed's "inquired about the portfolio" verb for general intent is a little bland — could add intent-specific copy + a small celebratory animation when a new activity item appears.
+- Domain "views" counter increments on every detail-open (no dedup); consider a simple per-session debounce.
+- Next-step feature ideas: a "Pi calculator" widget (convert USD↔Pi using the live ticker), a comparison view across multiple domains, a pioneer leaderboard with security-circle sizes, a blog/news listing for ecosystem updates, keyboard shortcuts (e.g. "/" to focus the domain lookup), and an animated count-up for the stats when they change.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

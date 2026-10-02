@@ -11,6 +11,10 @@ import { Faq } from "@/components/pi/faq";
 import { Contact } from "@/components/pi/contact";
 import { Newsletter } from "@/components/pi/newsletter";
 import { Footer } from "@/components/pi/footer";
+import { MarketChart } from "@/components/pi/market-chart";
+import { PioneerSpotlight } from "@/components/pi/pioneer-spotlight";
+import { EcosystemPulse } from "@/components/pi/ecosystem-pulse";
+import { ScrollProgress } from "@/components/pi/scroll-progress";
 
 async function getInitialData() {
   try {
@@ -29,6 +33,13 @@ async function getInitialData() {
           )
         : 0;
 
+    const series = priceLogs.map((l) => ({
+      t: l.createdAt.toISOString(),
+      price: l.priceUsd,
+      volume: l.volumeUsd,
+      marketCap: l.marketCap,
+    }));
+
     return {
       domainsCount,
       piStats: {
@@ -39,6 +50,7 @@ async function getInitialData() {
         marketCap: latest?.marketCap ?? 0,
         updatedAt: latest?.createdAt.toISOString() ?? null,
       },
+      series,
     };
   } catch (err) {
     console.error("[page] initial data fetch failed", err);
@@ -52,24 +64,29 @@ async function getInitialData() {
         marketCap: 47.2 * 65_000_000,
         updatedAt: new Date().toISOString(),
       },
+      series: [],
     };
   }
 }
 
 export default async function Home() {
-  const { domainsCount, piStats } = await getInitialData();
+  const { domainsCount, piStats, series } = await getInitialData();
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ScrollProgress />
       <Navbar />
       <main className="flex-1">
         <Hero />
         <TickerTape />
         <Stats domainsCount={domainsCount} />
         <DomainPortfolio />
+        <MarketChart series={series} latest={piStats} />
         <AboutPi />
         <Services />
+        <PioneerSpotlight />
         <Roadmap />
+        <EcosystemPulse />
         <Faq />
 
         {/* Live Pi price card before contact */}

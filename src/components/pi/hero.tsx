@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { PiLogo } from "./pi-logo";
+import { StarfieldCanvas } from "./starfield-canvas";
 
 interface LookupResult {
   label: string;
@@ -52,6 +53,7 @@ export function Hero() {
     <section id="top" className="relative overflow-hidden">
       {/* Background layers */}
       <div className="pointer-events-none absolute inset-0 pi-grid-bg" />
+      <StarfieldCanvas className="pointer-events-none absolute inset-0 opacity-70" />
       <div className="pointer-events-none absolute inset-0 pi-radial" />
       <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-pi-purple/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-16 top-10 h-72 w-72 rounded-full bg-pi-gold/20 blur-3xl" />
