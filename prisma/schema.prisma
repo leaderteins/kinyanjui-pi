@@ -75,3 +75,14 @@ model Article {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// Comments on blog articles
+model Comment {
+  id        String   @id @default(cuid())
+  articleSlug String
+  name      String
+  piHandle String?
+  body      String
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

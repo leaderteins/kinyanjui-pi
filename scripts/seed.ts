@@ -220,10 +220,52 @@ async function main() {
     await db.article.create({ data: { ...a, createdAt } });
   }
 
+  // Seed a few comments on articles
+  await db.comment.deleteMany();
+  const comments = [
+    {
+      articleSlug: "soko-pi-marketplace-mvp",
+      name: "Amara N.",
+      piHandle: "@amara.pi",
+      body: "This is exactly what the Pi community needs. Excited to list my crafts here!",
+    },
+    {
+      articleSlug: "soko-pi-marketplace-mvp",
+      name: "David K.",
+      piHandle: "@davidk.pi",
+      body: "Escrow will be a game-changer. When is the target launch?",
+    },
+    {
+      articleSlug: "why-pi-domains-matter",
+      name: "Lilian W.",
+      piHandle: "@lilianw.pi",
+      body: "Sending Pi to a name instead of an address just feels right. Great read.",
+    },
+    {
+      articleSlug: "piart-spotlight-amara",
+      name: "Tendai M.",
+      piHandle: "@tendai.pi",
+      body: "Congrats Amara! The royalty split model is inspiring.",
+    },
+    {
+      articleSlug: "market-pi-mainnet-graduation",
+      name: "Fatima A.",
+      piHandle: "@fatima.pi",
+      body: "Hoping .pi domains become the standard for wallet resolution post-Mainnet.",
+    },
+  ];
+  const commentTimes = [1, 0.3, 3, 2, 1.5];
+  for (let i = 0; i < comments.length; i++) {
+    const c = comments[i];
+    const createdAt = new Date(now - commentTimes[i] * 24 * 60 * 60 * 1000);
+    await db.comment.create({ data: { ...c, createdAt } });
+  }
+
   const count = await db.domain.count();
   const articleCount = await db.article.count();
+  const commentCount = await db.comment.count();
   console.log(
-    `✅ Seeded ${count} domains, 14 price log entries, and ${articleCount} articles.`
+    `✅ Seeded ${count} domains, 14 price log entries, ${articleCount} articles, and ${commentCount} comments.`
   );
 }
 

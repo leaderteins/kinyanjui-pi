@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { PiGlossary } from "./glossary";
 
 const FAQS = [
   {
@@ -41,6 +42,9 @@ export function Faq() {
   return (
     <section id="faq" className="relative scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center">
+          <PiGlossary />
+        </div>
         <div className="text-center">
           <Badge
             variant="outline"
@@ -54,7 +58,7 @@ export function Faq() {
           </h2>
           <p className="mt-3 text-pretty text-muted-foreground">
             Everything you might want to know about .pi domains and this
-            portfolio.
+            portfolio. Need a term defined? Tap the glossary above.
           </p>
         </div>
 

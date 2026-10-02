@@ -9,9 +9,14 @@ import {
   Calendar,
   X,
   Filter,
+  MessageSquare,
+  Send,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -21,6 +26,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+
+interface Comment {
+  id: string;
+  name: string;
+  piHandle: string | null;
+  body: string;
+  createdAt: string;
+}
 
 interface Article {
   id: string;
@@ -261,7 +274,7 @@ function ArticleDialog({
                 </div>
               </div>
             </div>
-            <div className="max-h-[55vh] overflow-y-auto p-6 pi-scroll">
+            <div className="max-h-[60vh] overflow-y-auto p-6 pi-scroll">
               <p className="mb-4 text-sm font-medium text-foreground">
                 {article.excerpt}
               </p>
@@ -284,10 +297,179 @@ function ArticleDialog({
                   Share <ArrowUpRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
+
+              <ArticleComments slug={article.slug} />
             </div>
           </>
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ArticleComments({ slug }: { slug: string }) {
+  const [comments, setComments] = React.useState<Comment[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [name, setName] = React.useState("");
+  const [piHandle, setPiHandle] = React.useState("");
+  const [body, setBody] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/comments?slug=${encodeURIComponent(slug)}`);
+      const data = (await res.json()) as { comments: Comment[] };
+      setComments(data.comments ?? []);
+    } catch {
+      /* no-op */
+    } finally {
+      setLoading(false);
+    }
+  }, [slug]);
+
+  React.useEffect(() => {
+    load();
+  }, [load]);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || name.trim().length < 2) {
+      toast.error("Please tell us your name.");
+      return;
+    }
+    if (!body.trim() || body.trim().length < 3) {
+      toast.error("Comment must be at least 3 characters.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          articleSlug: slug,
+          name,
+          piHandle: piHandle || undefined,
+          body,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Could not post comment.");
+        return;
+      }
+      setComments((prev) => [data.comment, ...prev]);
+      setName("");
+      setPiHandle("");
+      setBody("");
+      toast.success("Comment posted!");
+    } catch {
+      toast.error("Network error — please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="mt-6 border-t border-border/60 pt-5">
+      <h4 className="flex items-center gap-2 text-sm font-semibold">
+        <MessageSquare className="h-4 w-4 text-pi-gold" />
+        Comments
+        <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {loading ? "…" : comments.length}
+        </span>
+      </h4>
+
+      {/* New comment form */}
+      <form onSubmit={submit} className="mt-3 space-y-2.5">
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="h-9 text-sm"
+          />
+          <Input
+            value={piHandle}
+            onChange={(e) => setPiHandle(e.target.value)}
+            placeholder="@yourname.pi (optional)"
+            className="h-9 font-mono text-sm"
+          />
+        </div>
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Share your thoughts on this dispatch…"
+          rows={2}
+          className="w-full resize-y rounded-lg border border-input bg-background/60 px-3 py-2 text-sm outline-none transition-colors focus:border-pi-gold/40"
+        />
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground">
+            {body.length}/1000
+          </span>
+          <Button
+            type="submit"
+            disabled={submitting}
+            size="sm"
+            className="gap-1.5 rounded-full bg-gradient-to-r from-pi-gold to-pi-purple text-primary-foreground"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Posting…
+              </>
+            ) : (
+              <>
+                <Send className="h-3.5 w-3.5" /> Post comment
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+
+      {/* Comment list */}
+      <div className="mt-4 space-y-2.5">
+        {loading ? (
+          Array.from({ length: 2 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-xl" />
+          ))
+        ) : comments.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border/60 px-3 py-6 text-center text-xs text-muted-foreground">
+            No comments yet — be the first to weigh in.
+          </p>
+        ) : (
+          comments.map((c) => (
+            <div
+              key={c.id}
+              className="rounded-xl border border-border/60 bg-card/40 p-3"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-pi-gold/30 to-pi-purple/30 text-xs font-bold">
+                    {c.name.charAt(0).toUpperCase()}
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold leading-tight">
+                      {c.name}
+                    </p>
+                    {c.piHandle && (
+                      <p className="font-mono text-[10px] text-pi-gold">
+                        {c.piHandle}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {relativeDate(c.createdAt)}
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/90">
+                {c.body}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }

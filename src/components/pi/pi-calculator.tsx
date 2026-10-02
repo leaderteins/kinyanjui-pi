@@ -2,10 +2,16 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Calculator, ArrowLeftRight, TrendingUp, Wallet } from "lucide-react";
+import { Calculator, ArrowLeftRight, TrendingUp, Wallet, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PiCalculatorProps {
   priceUsd: number;
@@ -66,9 +72,28 @@ export function PiCalculator({ priceUsd, changePct }: PiCalculatorProps) {
             <Calculator className="h-4.5 w-4.5" />
           </span>
           <div>
-            <h3 className="text-sm font-semibold">Pi converter</h3>
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+              Pi converter
+              <TooltipProvider delayDuration={150}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      aria-label="Rate disclaimer"
+                      className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:text-pi-gold"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[220px] text-xs">
+                    The rate shown is illustrative for demo purposes only and is
+                    not financial advice. Always verify with live market data
+                    before transacting.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </h3>
             <p className="text-[11px] text-muted-foreground">
-              Live rate · 1 π ≈ {formatUsd(priceUsd)}
+              Illustrative rate · 1 π ≈ {formatUsd(priceUsd)}
             </p>
           </div>
         </div>

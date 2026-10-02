@@ -188,3 +188,72 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The command palette could grow to include domain search (filter the portfolio by name) and a "make an offer on <domain>" quick action.
 - Next-step feature ideas: domain comparison view (select 2-3 domains → side-by-side sheet), a "Pi glossary" popover for terms (security circle, node, mainnet), animated number transitions on the stats when activity updates, a dark "lights off" hero toggle, and a share-this-section button on each section.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 4
+Agent: main (Z.ai Code) — webDevReview cron round 3
+Task: QA the existing site, then add new features (domain comparison, glossary, comments, tip-of-day) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–3) — site had 11 sections: hero, portfolio, market chart, calculator, about, services, pioneers, roadmap, ecosystem pulse, blog, FAQ, contact, newsletter; plus make-offer modal, command palette, scroll-spy, back-to-top, starfield, 3D card tilt.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Domain comparison feature (src/components/pi/compare-sheet.tsx + integration in domain-portfolio.tsx):
+   - Each domain card now has an "Add to compare" toggle button (top-right), turning into "Added" with a gold ring when selected.
+   - Max 3 domains comparable; selecting a 4th shows a toast error.
+   - A floating "Compare bar" slides up from the bottom when ≥1 domain is selected, showing count + "Add X more (max 3)" hint, with Clear + Compare buttons.
+   - CompareSheet opens as a right-side Sheet with a side-by-side table: attribute rows (Category, Status, Asking price, Views, Tagline, Description) per domain; a "Best value" badge highlights the lowest-priced for-sale domain; per-domain "Inquire about X.pi" CTAs.
+   - DomainCard converted from motion.button → motion.div with a clickable overlay button (z-10) so the nested compare button (z-20) still works.
+2. Pi glossary (src/components/pi/glossary.tsx):
+   - A reusable popover with 8 Pi ecosystem terms (Pi Network, .pi domain, Pioneer, Security circle, Mainnet, Node, Pi wallet, Escrow), each with a short label + full definition.
+   - Searchable input filters terms live.
+   - Integrated as a "Glossary" trigger button at the top of the FAQ section.
+   - Also exports a `GlossaryTrigger` inline component for wrapping terms in text (available for future use).
+3. Blog comments (src/components/pi/blog.tsx ArticleComments + /api/comments + Comment model):
+   - Added Comment model to prisma schema (articleSlug, name, piHandle, body, approved, createdAt); pushed schema.
+   - Seeded 5 sample comments across 4 articles (Amara, David, Lilian, Tendai, Fatima) with realistic relative timestamps.
+   - New /api/comments route: GET ?slug= returns approved comments desc; POST validates (name ≥2, body 3–1000 chars) and persists.
+   - ArticleComments sub-component in the article Dialog: comment count badge, a form (name + optional @handle.pi + textarea with 1000-char counter), and a list of comments with avatar initials, handle, relative time, and body. New comments prepend optimistically + toast "Comment posted!".
+4. Tip of the day (src/components/pi/tip-of-day.tsx):
+   - 7 rotating pioneer tips (send to a name, build security circle slowly, mine every 24h, verify before transact, hold utility, backup passphrase, engage community) with branded accent per tip.
+   - Deterministic daily start (day-of-year mod 7) so the "tip of the day" is stable per day.
+   - Auto-advances every 9s; prev/next buttons + AnimatePresence crossfade; counter "01 / 07".
+   - Added as the middle column of the calculator section (now a 3-col grid: converter | tip | recap).
+5. Pi calculator disclaimer tooltip (pi-calculator.tsx):
+   - Info icon next to "Pi converter" heading opens a tooltip: "The rate shown is illustrative for demo purposes only and is not financial advice. Always verify with live market data before transacting."
+   - Renamed "Live rate" → "Illustrative rate" to be honest about the data source.
+
+Styling improvements:
+- Section numbering: added a `SectionNumber` component (e.g. "01 — Section") with a gradient gold number + gradient divider line, applied to the portfolio section as a template (can extend to others next round).
+- Compare bar: glassmorphic floating bar with spring entrance/exit animation.
+- Compare sheet: branded gradient header, accent-tinted column headers, "Best value" badge.
+- Glossary: searchable popover with hover-tinted term rows.
+- Tip-of-day: quote-mark flourish, animated transitions, accent blur.
+
+Bug found and fixed during QA:
+- After adding the Comment model + running `bun run db:push` (generates client), the running dev server held the OLD Prisma client → `db.comment` was undefined → /api/comments returned 500 ("Could not post comment"). This is the SAME class of bug as round 2 (stale Prisma client after schema change). Fixed by killing the stale next-dev process and restarting `bun run dev` (setsid-detached). Verified: GET /api/comments?slug=soko-pi-marketplace-mvp now returns 200 with 2 seeded comments; POST persists new comments.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all sections present.
+- Domain compare: clicked "Add to compare" on 2 cards → compare bar appeared ("2 domains ready to compare") → "Compare" opened the sheet → side-by-side table rendered with ATTRIBUTE column + 2 domain columns, "Best value" badge, per-domain "Inquire about X.pi" CTAs, and Remove buttons.
+- Glossary: clicked "Glossary" button in FAQ → popover opened with "Pi glossary" title, search input, and 8 term entries → searching "node" filtered to just the Node term with its definition.
+- Tip of the day: clicked "Next tip" → counter advanced 01→03 and heading changed to "A beginner's guide to Pi security circle".
+- Blog comments: opened soko.pi article → "Comments 2" heading with seeded comments (Amara N., David K.) → filled name "@test.pi" + body → "Post comment" → "Comment posted!" toast + comment count → 3 + new "Test Pioneer" comment prepended. Verified DB row: {name:"Test Pioneer", piHandle:"@test.pi", body:"This new comments feature is great! Testing from QA.", articleSlug:"soko-pi-marketplace-mvp"}.
+- Calculator disclaimer: hovered the Info icon → tooltip "The rate shown is illustrative for demo purposes only and is not financial advice. Always verify with live market data before transacting."
+- Mobile (iPhone 14): full-page screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 5 new components (CompareSheet + compare bar + compare toggle on cards, PiGlossary + popover, ArticleComments, TipOfDay, calculator disclaimer tooltip) + 1 new API route (/api/comments) + Comment model + 5 seeded comments.
+- Domain portfolio upgraded with comparison workflow; FAQ upgraded with glossary; calculator section is now a 3-col grid with the tip-of-day.
+- 1 real bug fixed (stale Prisma client after Comment model → /api/comments 500).
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The stale-Prisma-client-after-schema-change bug recurs every time the schema changes. Recommend adding a post-db-push hook (or a `dev:restart` script) that restarts the dev server automatically. Document in README.
+- The SectionNumber component is only applied to the portfolio section; extend to all major sections (about, services, market, blog, roadmap, pulse, faq, contact) for consistent visual rhythm.
+- Comments have no moderation UI yet; an admin endpoint to mark `approved=false` and hide would be useful.
+- The glossary GlossaryTrigger inline component is built but not yet used in article bodies — wiring it into FAQ/article text would make terms clickable.
+- Next-step feature ideas: a "share this section" button per section (deep-link + copy), a Pi wallet connect demo (mock), animated count-up on stats when activity updates them, a dark "lights off" hero toggle, a newsletter archive, and a comparison "winner" recommendation card.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

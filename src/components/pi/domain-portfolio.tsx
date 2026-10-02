@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   motion,
+  AnimatePresence,
   useMotionValue,
   useTransform,
   useSpring,
@@ -15,6 +16,9 @@ import {
   Filter,
   ChevronRight,
   HandCoins,
+  GitCompare,
+  Check,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +40,7 @@ import {
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 import { MakeOfferModal } from "./make-offer-modal";
+import { CompareSheet } from "./compare-sheet";
 
 const CATEGORIES = [
   { value: "all", label: "All" },
@@ -47,11 +52,15 @@ const CATEGORIES = [
   { value: "utility", label: "Utility" },
 ];
 
+const COMPARE_LIMIT = 3;
+
 export function DomainPortfolio() {
   const [domains, setDomains] = React.useState<PiDomain[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [active, setActive] = React.useState<string>("all");
   const [selected, setSelected] = React.useState<PiDomain | null>(null);
+  const [compareIds, setCompareIds] = React.useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = React.useState(false);
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -85,11 +94,35 @@ export function DomainPortfolio() {
     }
   }
 
+  function toggleCompare(id: string) {
+    setCompareIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= COMPARE_LIMIT) {
+        toast.error(`You can compare up to ${COMPARE_LIMIT} domains at once.`);
+        return prev;
+      }
+      return [...prev, id];
+    });
+  }
+
+  const compareDomains = domains.filter((d) => compareIds.includes(d.id));
+
+  function inquireFromCompare(d: PiDomain) {
+    setCompareOpen(false);
+    setTimeout(() => {
+      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+      toast(`Inquiring about ${d.name}`, {
+        description: "Scroll the contact form into view.",
+      });
+    }, 150);
+  }
+
   return (
     <section id="portfolio" className="relative scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl">
+            <SectionNumber n="01" />
             <Badge
               variant="outline"
               className="mb-3 gap-1.5 rounded-full border-pi-purple/30 bg-pi-purple/10 px-3 py-1 text-xs font-medium text-pi-purple"
@@ -138,6 +171,8 @@ export function DomainPortfolio() {
                   key={d.id}
                   domain={d}
                   index={i}
+                  checked={compareIds.includes(d.id)}
+                  onToggleCompare={() => toggleCompare(d.id)}
                   onOpen={() => openDomain(d)}
                 />
               ))}
@@ -156,17 +191,108 @@ export function DomainPortfolio() {
         domain={selected}
         onClose={() => setSelected(null)}
       />
+
+      {/* Compare bar + sheet */}
+      <CompareBar
+        count={compareDomains.length}
+        onOpen={() => setCompareOpen(true)}
+        onClear={() => setCompareIds([])}
+      />
+      <CompareSheet
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        domains={compareDomains}
+        onRemove={(id) =>
+          setCompareIds((prev) => prev.filter((x) => x !== id))
+        }
+        onClear={() => setCompareIds([])}
+        onInquire={inquireFromCompare}
+      />
     </section>
+  );
+}
+
+function CompareBar({
+  count,
+  onOpen,
+  onClear,
+}: {
+  count: number;
+  onOpen: () => void;
+  onClear: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {count > 0 && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:pb-0 sm:px-0"
+        >
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-pi-gold to-pi-purple text-primary-foreground">
+                <GitCompare className="h-4.5 w-4.5" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">
+                  {count} domain{count > 1 ? "s" : ""} ready to compare
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  {count < COMPARE_LIMIT
+                    ? `Add ${COMPARE_LIMIT - count} more (max ${COMPARE_LIMIT})`
+                    : "That's the max — open the comparison"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={onClear}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Clear
+              </Button>
+              <Button
+                size="sm"
+                onClick={onOpen}
+                className="gap-1.5 rounded-full bg-gradient-to-r from-pi-gold to-pi-purple text-primary-foreground"
+              >
+                <GitCompare className="h-3.5 w-3.5" />
+                Compare
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function SectionNumber({ n }: { n: string }) {
+  return (
+    <span className="mb-2 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground/70">
+      <span className="text-gradient-gold">{n}</span>
+      <span className="h-px w-8 bg-gradient-to-r from-pi-gold/60 to-transparent" />
+      Section
+    </span>
   );
 }
 
 function DomainCard({
   domain,
   index,
+  checked,
+  onToggleCompare,
   onOpen,
 }: {
   domain: PiDomain;
   index: number;
+  checked: boolean;
+  onToggleCompare: () => void;
   onOpen: () => void;
 }) {
   const accent = ACCENT_STYLES[domain.accent] ?? ACCENT_STYLES.gold;
@@ -187,7 +313,7 @@ function DomainCard({
   const glowX = useTransform(mx, [0, 1], ["0%", "100%"]);
   const glowY = useTransform(my, [0, 1], ["0%", "100%"]);
 
-  function onMove(e: React.MouseEvent<HTMLButtonElement>) {
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     mx.set((e.clientX - rect.left) / rect.width);
     my.set((e.clientY - rect.top) / rect.height);
@@ -198,12 +324,11 @@ function DomainCard({
   }
 
   return (
-    <motion.button
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.06 }}
-      onClick={onOpen}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       style={{
@@ -211,7 +336,7 @@ function DomainCard({
         rotateY,
         transformPerspective: 800,
       }}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${accent.border} bg-card/60 p-5 text-left backdrop-blur-sm transition-shadow hover:shadow-xl`}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border ${accent.border} ${checked ? "ring-2 ring-pi-gold/50" : ""} bg-card/60 p-5 text-left backdrop-blur-sm transition-shadow hover:shadow-xl`}
     >
       {/* cursor-follow glow */}
       <motion.div
@@ -236,23 +361,54 @@ function DomainCard({
         >
           {domain.emoji}
         </span>
-        <div className="flex flex-col items-end gap-1">
-          <Badge
-            variant="outline"
-            className={`rounded-full border ${accent.border} ${accent.bg} ${accent.text} text-[10px] font-medium`}
+        <div className="relative z-20 flex flex-col items-end gap-1.5">
+          {/* Compare toggle */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleCompare();
+            }}
+            aria-pressed={checked}
+            aria-label={checked ? "Remove from compare" : "Add to compare"}
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors ${
+              checked
+                ? "border-pi-gold/50 bg-pi-gold/15 text-pi-gold"
+                : "border-border/60 bg-card/40 text-muted-foreground hover:border-pi-gold/40 hover:text-pi-gold"
+            }`}
           >
-            {statusLabel}
-          </Badge>
-          {domain.featured && (
+            {checked ? (
+              <Check className="h-2.5 w-2.5" />
+            ) : (
+              <GitCompare className="h-2.5 w-2.5" />
+            )}
+            {checked ? "Added" : "Compare"}
+          </button>
+          <div className="flex flex-col items-end gap-1">
             <Badge
               variant="outline"
-              className="gap-1 rounded-full border-pi-gold/40 bg-pi-gold/10 text-[10px] text-pi-gold"
+              className={`rounded-full border ${accent.border} ${accent.bg} ${accent.text} text-[10px] font-medium`}
             >
-              <Sparkles className="h-2.5 w-2.5" /> Featured
+              {statusLabel}
             </Badge>
-          )}
+            {domain.featured && (
+              <Badge
+                variant="outline"
+                className="gap-1 rounded-full border-pi-gold/40 bg-pi-gold/10 text-[10px] text-pi-gold"
+              >
+                <Sparkles className="h-2.5 w-2.5" /> Featured
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Clickable overlay opens details */}
+      <button
+        onClick={onOpen}
+        aria-label={`View details for ${domain.name}`}
+        className="absolute inset-0 z-10 cursor-pointer"
+        tabIndex={-1}
+      />
 
       <div className="relative mt-4">
         <h3 className="font-mono text-lg font-bold tracking-tight">
@@ -283,7 +439,7 @@ function DomainCard({
       <span className="relative mt-3 inline-flex items-center gap-1 text-xs font-medium text-foreground/80 transition-colors group-hover:text-foreground">
         View details <ArrowUpRight className="h-3.5 w-3.5" />
       </span>
-    </motion.button>
+    </motion.div>
   );
 }
 

@@ -21,6 +21,7 @@ import { Blog } from "@/components/pi/blog";
 import { PiCalculator } from "@/components/pi/pi-calculator";
 import { CommandPalette } from "@/components/pi/command-palette";
 import { BackToTop } from "@/components/pi/back-to-top";
+import { TipOfDay } from "@/components/pi/tip-of-day";
 
 async function getInitialData() {
   try {
@@ -89,15 +90,16 @@ export default async function Home() {
         <DomainPortfolio />
         <MarketChart series={series} latest={piStats} />
 
-        {/* Pi converter alongside a recap */}
+        {/* Pi converter alongside tip of the day + recap */}
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid items-stretch gap-5 lg:grid-cols-[1fr_1fr]">
+          <div className="grid items-stretch gap-5 lg:grid-cols-3">
             <div id="calculator" className="scroll-mt-20">
               <PiCalculator
                 priceUsd={piStats.priceUsd}
                 changePct={piStats.changePct}
               />
             </div>
+            <TipOfDay />
             <div className="flex flex-col justify-center rounded-2xl border border-border/60 bg-card/30 p-6 backdrop-blur-sm">
               <Badge
                 variant="outline"
@@ -110,10 +112,9 @@ export default async function Home() {
                 <span className="text-gradient-gold">worth?</span>
               </h3>
               <p className="mt-3 text-pretty text-sm text-muted-foreground">
-                Plug an amount into the converter to see live USD equivalents at
-                the current illustrative rate. Whether you&apos;re sizing a
-                domain offer or pricing a marketplace listing, the math is one
-                tap away.
+                Plug an amount into the converter to see USD equivalents at the
+                current illustrative rate. Whether you&apos;re sizing a domain
+                offer or pricing a marketplace listing, the math is one tap away.
               </p>
               <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
