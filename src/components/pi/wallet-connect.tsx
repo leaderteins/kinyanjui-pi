@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { broadcastWalletChange } from "@/lib/wallet-state";
 
 interface WalletState {
   address: string;
@@ -84,6 +85,7 @@ export function WalletConnect() {
     } catch {
       /* ignore */
     }
+    broadcastWalletChange();
   }
 
   async function connect(choice: number) {

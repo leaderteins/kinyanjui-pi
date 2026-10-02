@@ -19,6 +19,8 @@ import {
   GitCompare,
   Check,
   X,
+  Heart,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,10 +39,16 @@ import {
   STATUS_LABELS,
   type PiDomain,
 } from "@/lib/pi";
+import {
+  useFavorites,
+  useRecentlyViewed,
+  type FavDomain,
+} from "@/lib/pi-storage";
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 import { MakeOfferModal } from "./make-offer-modal";
 import { CompareSheet } from "./compare-sheet";
+import { FavoritesDrawer } from "./favorites-drawer";
 
 const CATEGORIES = [
   { value: "all", label: "All" },
@@ -61,6 +69,9 @@ export function DomainPortfolio() {
   const [selected, setSelected] = React.useState<PiDomain | null>(null);
   const [compareIds, setCompareIds] = React.useState<string[]>([]);
   const [compareOpen, setCompareOpen] = React.useState(false);
+  const [favOpen, setFavOpen] = React.useState(false);
+  const { favorites, isFav, toggle: toggleFav, count: favCount } = useFavorites();
+  const { recent, track: trackRecent } = useRecentlyViewed();
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -81,8 +92,20 @@ export function DomainPortfolio() {
     load();
   }, [load]);
 
+  function toFav(d: PiDomain): FavDomain {
+    return {
+      id: d.id,
+      name: d.name,
+      label: d.label,
+      emoji: d.emoji,
+      accent: d.accent,
+      pricePi: d.pricePi,
+    };
+  }
+
   async function openDomain(d: PiDomain) {
     setSelected(d);
+    trackRecent(toFav(d));
     try {
       await fetch("/api/domains/view", {
         method: "POST",
@@ -91,6 +114,21 @@ export function DomainPortfolio() {
       });
     } catch {
       /* no-op */
+    }
+  }
+
+  function openFav(d: FavDomain) {
+    // find the full domain from the loaded list, or open a minimal card
+    const full = domains.find((x) => x.id === d.id) ?? null;
+    if (full) {
+      openDomain(full);
+    } else {
+      // domain not in the current filter — just track + scroll to portfolio
+      trackRecent(d);
+      document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth" });
+      toast(`Looking for ${d.name}`, {
+        description: "Switch the category filter to find it.",
+      });
     }
   }
 
@@ -141,24 +179,64 @@ export function DomainPortfolio() {
             </p>
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 pi-scroll">
-            <Filter className="h-4 w-4 shrink-0 text-muted-foreground" />
-            {CATEGORIES.map((c) => (
+          {/* Filters + favorites */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 pi-scroll">
+              <Filter className="h-4 w-4 shrink-0 text-muted-foreground" />
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c.value}
+                  onClick={() => setActive(c.value)}
+                  className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    active === c.value
+                      ? "border-pi-gold/50 bg-pi-gold/15 text-pi-gold"
+                      : "border-border/60 bg-card/40 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            {favCount > 0 && (
               <button
-                key={c.value}
-                onClick={() => setActive(c.value)}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active === c.value
-                    ? "border-pi-gold/50 bg-pi-gold/15 text-pi-gold"
-                    : "border-border/60 bg-card/40 text-muted-foreground hover:text-foreground"
-                }`}
+                onClick={() => setFavOpen(true)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-pi-rose/40 bg-pi-rose/10 px-3 py-1.5 text-xs font-medium text-pi-rose transition-colors hover:bg-pi-rose/20"
               >
-                {c.label}
+                <Heart className="h-3.5 w-3.5" />
+                {favCount}
               </button>
-            ))}
+            )}
           </div>
         </div>
+
+        {/* Recently viewed strip */}
+        {recent.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 flex items-center gap-3 overflow-x-auto rounded-2xl border border-border/60 bg-card/30 p-3 pi-scroll"
+          >
+            <span className="flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 text-pi-gold" />
+              Recently viewed
+            </span>
+            <div className="flex gap-2">
+              {recent.map((d) => {
+                const accent = ACCENT_STYLES[d.accent] ?? ACCENT_STYLES.gold;
+                return (
+                  <button
+                    key={d.id}
+                    onClick={() => openFav(d)}
+                    className="flex shrink-0 items-center gap-1.5 rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-xs transition-colors hover:border-pi-gold/40 hover:text-pi-gold"
+                  >
+                    <span className="text-sm">{d.emoji}</span>
+                    <span className="font-mono font-medium">{d.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {/* Grid */}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -173,6 +251,8 @@ export function DomainPortfolio() {
                   index={i}
                   checked={compareIds.includes(d.id)}
                   onToggleCompare={() => toggleCompare(d.id)}
+                  fav={isFav(d.id)}
+                  onToggleFav={() => toggleFav(toFav(d))}
                   onOpen={() => openDomain(d)}
                 />
               ))}
@@ -207,6 +287,12 @@ export function DomainPortfolio() {
         }
         onClear={() => setCompareIds([])}
         onInquire={inquireFromCompare}
+      />
+
+      <FavoritesDrawer
+        open={favOpen}
+        onOpenChange={setFavOpen}
+        onSelectDomain={openFav}
       />
     </section>
   );
@@ -287,12 +373,16 @@ function DomainCard({
   index,
   checked,
   onToggleCompare,
+  fav,
+  onToggleFav,
   onOpen,
 }: {
   domain: PiDomain;
   index: number;
   checked: boolean;
   onToggleCompare: () => void;
+  fav: boolean;
+  onToggleFav: () => void;
   onOpen: () => void;
 }) {
   const accent = ACCENT_STYLES[domain.accent] ?? ACCENT_STYLES.gold;
@@ -361,7 +451,23 @@ function DomainCard({
         >
           {domain.emoji}
         </span>
-        <div className="relative z-20 flex flex-col items-end gap-1.5">
+        <div className="relative z-20 flex items-center gap-1.5">
+          {/* Favorite toggle */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFav();
+            }}
+            aria-pressed={fav}
+            aria-label={fav ? "Remove from favorites" : "Add to favorites"}
+            className={`flex h-7 w-7 items-center justify-center rounded-full border transition-colors ${
+              fav
+                ? "border-pi-rose/50 bg-pi-rose/15 text-pi-rose"
+                : "border-border/60 bg-card/40 text-muted-foreground hover:border-pi-rose/40 hover:text-pi-rose"
+            }`}
+          >
+            <Heart className={`h-3.5 w-3.5 ${fav ? "fill-pi-rose" : ""}`} />
+          </button>
           {/* Compare toggle */}
           <button
             onClick={(e) => {
@@ -383,23 +489,33 @@ function DomainCard({
             )}
             {checked ? "Added" : "Compare"}
           </button>
-          <div className="flex flex-col items-end gap-1">
-            <Badge
-              variant="outline"
-              className={`rounded-full border ${accent.border} ${accent.bg} ${accent.text} text-[10px] font-medium`}
-            >
-              {statusLabel}
-            </Badge>
-            {domain.featured && (
-              <Badge
-                variant="outline"
-                className="gap-1 rounded-full border-pi-gold/40 bg-pi-gold/10 text-[10px] text-pi-gold"
-              >
-                <Sparkles className="h-2.5 w-2.5" /> Featured
-              </Badge>
-            )}
-          </div>
         </div>
+      </div>
+
+      {/* Status + featured badges row */}
+      <div className="relative mt-3 flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className={`rounded-full border ${accent.border} ${accent.bg} ${accent.text} text-[10px] font-medium`}
+        >
+          {statusLabel}
+        </Badge>
+        {domain.featured && (
+          <Badge
+            variant="outline"
+            className="gap-1 rounded-full border-pi-gold/40 bg-pi-gold/10 text-[10px] text-pi-gold"
+          >
+            <Sparkles className="h-2.5 w-2.5" /> Featured
+          </Badge>
+        )}
+        {fav && (
+          <Badge
+            variant="outline"
+            className="gap-1 rounded-full border-pi-rose/40 bg-pi-rose/10 text-[10px] text-pi-rose"
+          >
+            <Heart className="h-2.5 w-2.5 fill-pi-rose" /> Saved
+          </Badge>
+        )}
       </div>
 
       {/* Clickable overlay opens details */}

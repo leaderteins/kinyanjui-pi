@@ -322,3 +322,62 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The share button uses the native Web Share API where available; on desktop browsers without it, it falls back to copy-link — could add social share targets (Twitter/X, Telegram) as explicit buttons.
 - Next-step feature ideas: a "Pi wallet balance" integration into the make-offer modal (show "you have X π, offer is Y π"), a newsletter archive page, animated count-up on stats when activity updates, a dark "lights off" hero toggle, a domain "favorite/bookmark" with localStorage persistence, and a "recently viewed domains" strip.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 6
+Agent: main (Z.ai Code) — webDevReview cron round 5
+Task: QA the existing site, then add new features (favorites, recently viewed, wallet balance in offer modal, social share) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–5) — site had 11 sections with wallet connect, share buttons, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Domain favorites/bookmarks (src/lib/pi-storage.ts + favorites-drawer.tsx + integration in domain-portfolio.tsx):
+   - A shared localStorage hook (useFavorites) with cross-tab event sync (custom "kinyanjui-pi-storage" event + native "storage" event).
+   - Each domain card now has a heart toggle button (top-right, next to the compare button) — fills rose-red when favorited.
+   - A "Saved" badge appears on favorited cards in the status row.
+   - A favorites counter pill (rose-tinted, with heart icon + count) appears in the portfolio header when ≥1 domain is favorited.
+   - Clicking the counter opens a FavoritesDrawer (right-side Sheet) listing all saved domains with emoji, name, price, a "View" button, and a "Clear" action. Empty state with guidance. "Saved locally in your browser" note.
+2. Recently viewed domains (src/lib/pi-storage.ts useRecentlyViewed + strip in domain-portfolio.tsx):
+   - A useRecentlyViewed hook tracks domains opened (via the detail dialog) in localStorage (max 6, deduped, most-recent-first).
+   - A horizontal "Recently viewed" strip appears above the portfolio grid when ≥1 domain has been viewed, showing clickable domain chips (emoji + name) that re-open the domain detail.
+3. Wallet balance in make-offer modal (make-offer-modal.tsx):
+   - A new useWalletState hook (src/lib/wallet-state.ts) subscribes to wallet changes via a custom event broadcast by WalletConnect's persist function.
+   - The make-offer modal now shows the connected wallet's handle + balance in a teal/rose-tinted row below the "vs asking" comparison.
+   - If the offer exceeds the connected balance, a rose warning appears: "Your offer exceeds your connected balance by X π. You can still submit — settlement can be arranged."
+   - If sufficient, a "✓ You have enough balance to cover this offer." confirmation shows.
+   - WalletConnect updated to broadcast changes so the modal reactively updates on connect/disconnect.
+4. Social share targets (share-button.tsx):
+   - The share popover now has explicit "Share to" targets: "X / Twitter" (opens twitter.com/intent/tweet), "Telegram" (opens t.me/share/url), "More… (Web Share)" (native API), and "Copy deep link".
+   - Each social target opens in a new window with noopener,noreferrer; includes the section's deep-link URL + a descriptive text.
+
+Styling improvements:
+- Domain cards restructured: emoji + heart/compare buttons on top, then a status/featured/saved badge row, then the domain name + tagline, then footer. Cleaner visual hierarchy.
+- Favorites counter pill in the portfolio header (rose-themed).
+- Recently viewed strip with a clock icon label + horizontal scroll chips.
+- Wallet balance row in the offer modal with teal/rose conditional theming.
+- Share popover with "Share to" section header + divider before the copy action.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all 11 sections present.
+- Favorites: clicked the heart on kinyanjui.pi card → button changed to "Remove from favorites" → a "Saved" badge appeared on the card → a favorites counter pill ("1") appeared in the portfolio header → clicking it opened the FavoritesDrawer with "Favorite domains" title, "1 saved domain" subtitle, the kinyanjui.pi entry with emoji + name + View button, and a Clear button. Verified via DOM: 1 savedBadge present.
+- Recently viewed: opened soko.pi detail dialog → closed → the "RECENTLY VIEWED" strip appeared above the grid with a soko.pi chip (🛍️soko.pi). Clicking the chip re-opens the domain.
+- Wallet balance in offer modal: connected newcomer.pi (89.12 π) → opened kilimo.pi (asking 2,400 π) → "Make an offer" → modal showed "newcomer.pi" + "89.12" in a teal/rose balance row + "Your offer exceeds your connected balance by" warning (since 2,400 > 89.12) + "Submit offer of 2,400 π" button. The balance check correctly detects insufficient funds.
+- Social share: opened the "Share about section" popover → "Share to" header + "X / Twitter", "Telegram", "More… (Web Share)", "Copy deep link" buttons all present.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new features: favorites/bookmarks with drawer, recently-viewed strip, wallet-balance integration in the offer modal, and social share targets.
+- 2 new shared hooks: useFavorites/useRecentlyViewed (localStorage + cross-tab sync) and useWalletState (wallet subscription).
+- 1 new component: FavoritesDrawer.
+- Domain cards restructured with a cleaner badge hierarchy + heart toggle.
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The wallet balance integration is read-only (display + warning); a future phase could let the user actually "fund" the offer from the connected wallet (mock transaction).
+- Favorites and recently-viewed are per-browser (localStorage); they won't sync across devices. A future phase with accounts could sync these server-side.
+- The SectionHeader is applied to 5 sections; could extend to market chart, pioneers, ecosystem pulse, blog, contact for full consistency.
+- Next-step feature ideas: a "Pi glossary" integration into blog article bodies (inline triggers), a domain "detail" deep-link that opens the dialog on load via URL hash, a dark "lights off" hero toggle, animated count-up on stats when activity updates, a newsletter archive, and a "domain of the week" spotlight banner.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

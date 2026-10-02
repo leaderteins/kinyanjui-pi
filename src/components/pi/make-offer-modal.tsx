@@ -10,6 +10,7 @@ import {
   Loader2,
   ArrowRight,
   Wallet,
+  AlertTriangle,
 } from "lucide-react";
 import {
   Dialog,
@@ -25,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ACCENT_STYLES, STATUS_LABELS, type PiDomain } from "@/lib/pi";
+import { useWalletState } from "@/lib/wallet-state";
 
 interface MakeOfferModalProps {
   domain: PiDomain | null;
@@ -44,6 +46,8 @@ export function MakeOfferModal({ domain, open, onOpenChange }: MakeOfferModalPro
     ? ACCENT_STYLES[domain.accent] ?? ACCENT_STYLES.gold
     : ACCENT_STYLES.gold;
 
+  const { wallet } = useWalletState();
+
   const asking = domain?.pricePi ?? 1000;
   const [amount, setAmount] = React.useState<number>(asking);
   const [name, setName] = React.useState("");
@@ -60,6 +64,7 @@ export function MakeOfferModal({ domain, open, onOpenChange }: MakeOfferModalPro
   }, [open, domain, asking]);
 
   const diff = amount - asking;
+  const insufficientFunds = wallet ? amount > wallet.piBalance : false;
   const diffPct = asking ? (diff / asking) * 100 : 0;
 
   function adjust(delta: number) {
@@ -224,6 +229,47 @@ export function MakeOfferModal({ domain, open, onOpenChange }: MakeOfferModalPro
                       {diffPct.toFixed(1)}%)
                     </span>
                   </div>
+                )}
+
+                {/* wallet balance check */}
+                {wallet && (
+                  <div
+                    className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs ${
+                      insufficientFunds
+                        ? "border-pi-rose/40 bg-pi-rose/10"
+                        : "border-pi-teal/40 bg-pi-teal/10"
+                    }`}
+                  >
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <Wallet className="h-3.5 w-3.5" />
+                      {wallet.handle}
+                    </span>
+                    <span
+                      className={`font-mono font-semibold ${
+                        insufficientFunds ? "text-pi-rose" : "text-pi-teal"
+                      }`}
+                    >
+                      {wallet.piBalance.toLocaleString(undefined, {
+                        maximumFractionDigits: 2,
+                      })}{" "}
+                      π
+                    </span>
+                  </div>
+                )}
+                {wallet && insufficientFunds && (
+                  <p className="flex items-center gap-1.5 rounded-lg border border-pi-rose/40 bg-pi-rose/10 px-3 py-2 text-[11px] text-pi-rose">
+                    <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                    Your offer exceeds your connected balance by{" "}
+                    {(amount - wallet.piBalance).toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    π. You can still submit — settlement can be arranged.
+                  </p>
+                )}
+                {wallet && !insufficientFunds && (
+                  <p className="text-[11px] text-muted-foreground">
+                    ✓ You have enough balance to cover this offer.
+                  </p>
                 )}
               </div>
 
