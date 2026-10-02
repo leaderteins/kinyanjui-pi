@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/pi/navbar";
 import { Hero } from "@/components/pi/hero";
 import { TickerTape } from "@/components/pi/ticker-tape";
@@ -15,6 +17,10 @@ import { MarketChart } from "@/components/pi/market-chart";
 import { PioneerSpotlight } from "@/components/pi/pioneer-spotlight";
 import { EcosystemPulse } from "@/components/pi/ecosystem-pulse";
 import { ScrollProgress } from "@/components/pi/scroll-progress";
+import { Blog } from "@/components/pi/blog";
+import { PiCalculator } from "@/components/pi/pi-calculator";
+import { CommandPalette } from "@/components/pi/command-palette";
+import { BackToTop } from "@/components/pi/back-to-top";
 
 async function getInitialData() {
   try {
@@ -82,11 +88,57 @@ export default async function Home() {
         <Stats domainsCount={domainsCount} />
         <DomainPortfolio />
         <MarketChart series={series} latest={piStats} />
+
+        {/* Pi converter alongside a recap */}
+        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid items-stretch gap-5 lg:grid-cols-[1fr_1fr]">
+            <div id="calculator" className="scroll-mt-20">
+              <PiCalculator
+                priceUsd={piStats.priceUsd}
+                changePct={piStats.changePct}
+              />
+            </div>
+            <div className="flex flex-col justify-center rounded-2xl border border-border/60 bg-card/30 p-6 backdrop-blur-sm">
+              <Badge
+                variant="outline"
+                className="mb-3 w-fit gap-1.5 rounded-full border-pi-gold/30 bg-pi-gold/10 px-3 py-1 text-xs font-medium text-pi-gold"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Try the math
+              </Badge>
+              <h3 className="text-balance text-2xl font-bold tracking-tight">
+                What could your Pi be{" "}
+                <span className="text-gradient-gold">worth?</span>
+              </h3>
+              <p className="mt-3 text-pretty text-sm text-muted-foreground">
+                Plug an amount into the converter to see live USD equivalents at
+                the current illustrative rate. Whether you&apos;re sizing a
+                domain offer or pricing a marketplace listing, the math is one
+                tap away.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-gold" />
+                  Real-time rate from the portfolio ticker
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-purple" />
+                  Quick-amount presets for fast sizing
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-teal" />
+                  Bidirectional — flip π ↔ USD instantly
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
         <AboutPi />
         <Services />
         <PioneerSpotlight />
         <Roadmap />
         <EcosystemPulse />
+        <Blog />
         <Faq />
 
         {/* Live Pi price card before contact */}
@@ -98,6 +150,8 @@ export default async function Home() {
         <Newsletter />
       </main>
       <Footer />
+      <CommandPalette />
+      <BackToTop />
     </div>
   );
 }

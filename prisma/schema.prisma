@@ -58,3 +58,20 @@ model PiPriceLog {
   marketCap Float
   createdAt DateTime @default(now())
 }
+
+// Ecosystem news / blog articles
+model Article {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  body        String
+  category    String   @default("update") // update | guide | spotlight | market
+  author      String   @default("kinyanjui.pi")
+  emoji       String   @default("📰")
+  accent      String   @default("gold")
+  readingMins Int      @default(3)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

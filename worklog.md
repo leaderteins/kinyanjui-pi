@@ -123,3 +123,68 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - Domain "views" counter increments on every detail-open (no dedup); consider a simple per-session debounce.
 - Next-step feature ideas: a "Pi calculator" widget (convert USD↔Pi using the live ticker), a comparison view across multiple domains, a pioneer leaderboard with security-circle sizes, a blog/news listing for ecosystem updates, keyboard shortcuts (e.g. "/" to focus the domain lookup), and an animated count-up for the stats when they change.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 3
+Agent: main (Z.ai Code) — webDevReview cron round 2
+Task: QA the existing site, then add new features (Pi calculator, command palette, blog) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1 & 2) — site was stable with market chart, make-offer modal, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, scroll progress.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean.
+- 11 sections present in DOM: top, portfolio, market, about, services, pioneers, roadmap, pulse, blog(?), faq, contact.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Pi Calculator widget (src/components/pi/pi-calculator.tsx):
+   - Bidirectional USD ↔ Pi converter using the live ticker price.
+   - Pi amount field + USD field; one editable at a time based on direction; "Flip" button swaps direction.
+   - Quick-amount preset chips (100/500/1k/5k π or $10/$50/$100/$500 depending on direction).
+   - Live rate badge + 24h change % display.
+   - Paired with a "What could your Pi be worth?" info card in a 2-col layout (section id="calculator").
+2. Command palette + global keyboard shortcuts (src/components/pi/command-palette.tsx):
+   - ⌘K / Ctrl+K opens a cmdk-powered palette (Navigate / Actions / Shortcuts groups).
+   - "/" focuses the hero domain lookup input and scrolls it into view.
+   - "t" → back to top; "d" → domains; "n" → news/blog; "c" → contact.
+   - Palette includes a "Toggle theme" action and a shortcuts cheat-sheet.
+   - Trigger button ("⌘K") added to the navbar (desktop) and mobile menu.
+3. Blog / Ecosystem dispatch (src/components/pi/blog.tsx) + GET /api/articles:
+   - Added Article model to prisma schema (slug, title, excerpt, body, category, author, emoji, accent, readingMins, published, timestamps); pushed schema + regenerated client.
+   - Seeded 6 articles (soko.pi MVP beta, why .pi domains matter, Amara NFT spotlight, Mainnet graduation market view, kilimo.pi agriculture pilot, security circles guide) across 4 categories (update/guide/spotlight/market) with realistic relative timestamps.
+   - Category filter chips (All/Updates/Guides/Spotlights/Market) client-fetched from /api/articles?category=.
+   - Article cards with emoji, category badge, reading time, relative date; click opens a detail Dialog with full body, author byline, and a "Share" (copy title) action.
+4. Back-to-top FAB (src/components/pi/back-to-top.tsx):
+   - Fixed bottom-right gradient button that appears after scrolling >800px; smooth-scrolls to top.
+
+Styling improvements:
+- Navbar scroll-spy: IntersectionObserver highlights the active nav link with a brighter color + an animated gradient underline (framer-motion layoutId) that slides between links.
+- New "Pi converter" + "Ecosystem dispatch" section headers with branded badges.
+- Command palette trigger chip in navbar.
+- Refined 2-col layout pairing the calculator with a benefit recap card.
+
+Bug found and fixed during QA:
+- After adding the Article model and running `bun run db:push` (which generates the client), the already-running dev server still held the OLD Prisma client in memory → `db.article` was undefined → /api/articles returned 500 ("Cannot read properties of undefined (reading 'findMany')"). Fixed by killing the stale next-dev process and restarting `bun run dev` (setsid-detached) so the freshly-generated client was loaded. Verified: GET /api/articles?category=all now returns 200 with all 6 articles; GET /api/articles?category=guide correctly returns 2.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all 11 sections present.
+- Command palette: ⌘K opens it; Navigate/Actions/Shortcuts groups render; clicking "News" scrolls to the blog section.
+- Pi converter: shows 100 π = $5,580 at $55.80/π rate; Flip button swaps editable field + preset chips; quick amounts work.
+- Blog: 6 article cards render; category filter works (verified via API: guide → 2 articles); article detail Dialog opens with full body + author byline; "Share" copies title + "Title copied" toast.
+- Keyboard shortcuts: "/" focuses the domain lookup input; "t" scrolls to top.
+- Navbar scroll-spy: scrolling to #portfolio highlights "Domains" link (brighter color + animated gradient underline span present).
+- Back-to-top FAB: appears after scrolling, scrolls to top on click.
+- Mobile (iPhone 14): full-page screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new components added (PiCalculator, CommandPalette, Blog+ArticleDialog, BackToTop) + 1 new API route (/api/articles) + Article model + 6 seeded articles.
+- Navbar upgraded with scroll-spy active states + command palette trigger.
+- 1 real bug fixed (stale Prisma client after schema change → /api/articles 500).
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The dev server must be restarted whenever the Prisma schema changes (HMR doesn't reload the generated client). Document this in the README or add a post-db-push hook.
+- Blog articles are static content for now; a future phase could add an author profile system + a write-comment flow (persisted) + a "Pi tip of the day" rotating card.
+- The Pi converter rate is illustrative; could add a disclaimer tooltip clarifying it's not financial advice.
+- The command palette could grow to include domain search (filter the portfolio by name) and a "make an offer on <domain>" quick action.
+- Next-step feature ideas: domain comparison view (select 2-3 domains → side-by-side sheet), a "Pi glossary" popover for terms (security circle, node, mainnet), animated number transitions on the stats when activity updates, a dark "lights off" hero toggle, and a share-this-section button on each section.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
