@@ -257,3 +257,68 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The glossary GlossaryTrigger inline component is built but not yet used in article bodies — wiring it into FAQ/article text would make terms clickable.
 - Next-step feature ideas: a "share this section" button per section (deep-link + copy), a Pi wallet connect demo (mock), animated count-up on stats when activity updates them, a dark "lights off" hero toggle, a newsletter archive, and a comparison "winner" recommendation card.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 5
+Agent: main (Z.ai Code) — webDevReview cron round 4
+Task: QA the existing site, then add new features (wallet connect, share buttons, section numbering, glossary triggers, comparison winner) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–4) — site had 11 sections with domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Pi wallet connect demo (src/components/pi/wallet-connect.tsx):
+   - A "Connect wallet" button in the navbar (desktop) that opens a modal with 3 mock Pi wallets (kinyanjui.pi @1,247.83 π, pioneer.pi @384.5 π, newcomer.pi @89.12 π).
+   - Simulated connection handshake (1.1s loading state) → connected state persisted to localStorage.
+   - Connected state shows a pill button with a live teal pulse dot + truncated address; clicking opens a dropdown with the full handle, address, Pi balance (with USD equiv), Copy address, Browse domains, and Disconnect actions.
+   - "Demo mode" badge + disclaimer footer clarify no real wallet/funds are involved.
+   - Hydration-safe (renders a stable placeholder until mounted).
+2. Share this section (src/components/pi/share-button.tsx):
+   - A reusable popover button that appears on each section header.
+   - "Share…" triggers the native Web Share API (where available); "Copy deep link" copies `${origin}${pathname}#sectionId` to clipboard + toast "Section link copied" with the URL.
+   - Button label flips to "Copied!" with a check icon for 2s.
+3. SectionHeader component (src/components/pi/section-header.tsx):
+   - Standardized section header combining: a numbered label (e.g. "01 — Section" with gradient gold number + gradient divider line), an optional badge, the title, description, and a ShareButton.
+   - Supports left and center alignment.
+   - Applied to: portfolio (01), about (02), services (03), roadmap (05), FAQ (07) — replacing the hand-rolled Badge + h2 + p pattern for consistent visual rhythm.
+4. GlossaryTrigger inline terms wired into FAQ (faq.tsx):
+   - Converted FAQ answers from plain strings to React nodes with inline <GlossaryTrigger> wrappers.
+   - Terms now clickable: ".pi domain", "Pi Network", "Escrow", "Mainnet", "Pioneer", "Pi wallet", "Security circle", "Node" — each opens a popover with the term's short label + full definition.
+   - FAQ section also got the SectionHeader + retained the glossary search button at the top.
+5. Comparison "winner" recommendation (compare-sheet.tsx):
+   - When 2+ for-sale domains are compared, a gradient recommendation banner appears above the table: "OUR RECOMMENDATION — X.pi offers the best value at N π — the lowest asking price among the for-sale domains you're comparing." with a "Grab it" CTA.
+   - The "BEST VALUE" badge on the winning column header is retained from round 3.
+
+Styling improvements:
+- SectionHeader gives every major section a consistent numbered rhythm (01–07) with gradient dividers.
+- Share buttons on section headers add a subtle interactive affordance.
+- Wallet connect pill with live pulse dot + branded dropdown menu.
+- FAQ inline glossary terms styled as dotted-underline gold links.
+
+Bug found and fixed during QA:
+- The comparison "winner" recommendation initially showed whenever `domains.length >= 2 && bestValue` — but if only ONE of the compared domains was for-sale (the other held/developed), `bestValue` was that single domain and the banner misleadingly said "lowest asking price among the for-sale domains you're comparing" when there was nothing to compare against. Fixed the condition to `onSale.length >= 2` so the recommendation only appears when there are genuinely 2+ for-sale domains to rank. Verified: with piwallet (9,200 π) + kilimo (2,400 π) both for-sale, the banner correctly recommends kilimo.pi at 2,400 π; with piwallet + piswap (held), no banner shows.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors.
+- Wallet connect: "Connect wallet" button in navbar → dialog with 3 mock wallets → clicked kinyanjui.pi → "Connected as kinyanjui.pi Balance: 1,247.83 π" toast → wallet menu pill appeared → clicking opened dropdown with handle, address, Pi balance, Copy address, Browse domains, Disconnect.
+- Share button: clicked "Share about section" → popover with "Share…" + "Copy deep link" → "Copy deep link" → "Section link copied" toast with URL http://localhost:3000/#about + button flipped to "Copied!".
+- Section numbers: verified "01", "02", "03", "05", "07" render across portfolio, about, services, roadmap, FAQ.
+- FAQ glossary triggers: expanded "What is a .pi domain?" → answer contains clickable ".pi domain" and "Pi Network" buttons (verified via DOM query).
+- Comparison winner: selected piwallet (9,200 π) + kilimo (2,400 π) → opened compare sheet → "OUR RECOMMENDATION — kilimo.pi offers the best value at 2,400 π" banner + "Grab it" button + "BEST VALUE" badge on kilimo column. Correctly picks the cheaper domain.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 5 new components (WalletConnect + dialog + dropdown, ShareButton + popover, SectionHeader, GlossaryTrigger wired into FAQ, comparison winner banner) integrated across the site.
+- Section headers standardized with numbered rhythm + share buttons.
+- FAQ answers now interactive with inline glossary popovers.
+- 1 UX bug fixed (comparison winner showing with only 1 for-sale domain → misleading "lowest price" claim).
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The wallet connect is mock-only; a future phase could integrate a real Pi wallet SDK (when available) or a WalletConnect-style protocol adapter.
+- The SectionHeader is applied to 5 sections (portfolio, about, services, roadmap, FAQ); could extend to market chart, pioneers, ecosystem pulse, blog, contact for full consistency (currently those retain their hand-rolled headers).
+- The share button uses the native Web Share API where available; on desktop browsers without it, it falls back to copy-link — could add social share targets (Twitter/X, Telegram) as explicit buttons.
+- Next-step feature ideas: a "Pi wallet balance" integration into the make-offer modal (show "you have X π, offer is Y π"), a newsletter archive page, animated count-up on stats when activity updates, a dark "lights off" hero toggle, a domain "favorite/bookmark" with localStorage persistence, and a "recently viewed domains" strip.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

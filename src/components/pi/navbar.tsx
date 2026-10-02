@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PiLogo } from "./pi-logo";
+import { WalletConnect } from "./wallet-connect";
 import { NAV_LINKS } from "@/lib/pi";
 
 const SECTION_IDS = ["top", "portfolio", "about", "services", "roadmap", "faq", "contact"];
@@ -117,6 +118,7 @@ export function Navbar() {
               Explore Domains
             </Button>
           </Link>
+          <WalletConnect />
           <ThemeToggle />
           <Button
             variant="ghost"

@@ -10,6 +10,9 @@ import {
   Eye,
   Tag,
   Trash2,
+  Trophy,
+  Sparkles,
+  TrendingDown,
 } from "lucide-react";
 import {
   Sheet,
@@ -139,7 +142,44 @@ export function CompareSheet({
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto pi-scroll">
+            <div>
+              {/* Recommendation banner — only meaningful with 2+ for-sale domains */}
+              {onSale.length >= 2 && bestValue && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-pi-gold/30 bg-gradient-to-r from-pi-gold/10 via-card to-pi-purple/10 p-4"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pi-gold to-pi-purple text-primary-foreground">
+                    <Trophy className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-pi-gold">
+                      <Sparkles className="h-3 w-3" /> Our recommendation
+                    </p>
+                    <p className="mt-0.5 text-sm">
+                      <span className="font-mono font-bold">
+                        {bestValue.label}.pi
+                      </span>{" "}
+                      offers the best value at{" "}
+                      <span className="font-mono font-semibold text-pi-gold">
+                        {bestValue.pricePi?.toLocaleString()} π
+                      </span>{" "}
+                      — the lowest asking price among the for-sale domains
+                      you&apos;re comparing.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => onInquire(bestValue)}
+                    className="gap-1.5 rounded-full bg-gradient-to-r from-pi-gold to-pi-purple text-primary-foreground"
+                  >
+                    <TrendingDown className="h-3.5 w-3.5" />
+                    Grab it
+                  </Button>
+                </motion.div>
+              )}
+              <div className="overflow-x-auto pi-scroll">
               <table className="w-full min-w-[640px] border-collapse text-sm">
                 <thead>
                   <tr>
@@ -242,6 +282,7 @@ export function CompareSheet({
                   </tr>
                 </tfoot>
               </table>
+              </div>
             </div>
           )}
         </div>

@@ -9,32 +9,86 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { PiGlossary } from "./glossary";
+import { PiGlossary, GlossaryTrigger } from "./glossary";
+import { SectionHeader } from "./section-header";
 
-const FAQS = [
+const FAQS: { q: string; a: React.ReactNode }[] = [
   {
     q: "What is a .pi domain?",
-    a: "A .pi domain is a human-readable name that resolves on the Pi Network blockchain — similar to how .eth names work on Ethereum. Instead of sharing a long wallet address, you share a name like kinyanjui.pi. It can point to wallets, websites and apps inside the Pi ecosystem.",
+    a: (
+      <>
+        A <GlossaryTrigger term=".pi domain">.pi domain</GlossaryTrigger> is a
+        human-readable name that resolves on the{" "}
+        <GlossaryTrigger term="Pi Network">Pi Network</GlossaryTrigger>{" "}
+        blockchain — similar to how .eth names work on Ethereum. Instead of
+        sharing a long wallet address, you share a name like kinyanjui.pi. It
+        can point to wallets, websites and apps inside the Pi ecosystem.
+      </>
+    ),
   },
   {
     q: "Can I buy one of the domains in this portfolio?",
-    a: "Some domains are marked 'For Sale' with an asking price in Pi. Others are 'Held' or 'In Development' but open to partnership, joint ventures or licensing. Use the contact form below with your offer or idea and we'll take it from there.",
+    a: (
+      <>
+        Some domains are marked &apos;For Sale&apos; with an asking price in Pi.
+        Others are &apos;Held&apos; or &apos;In Development&apos; but open to
+        partnership, joint ventures or licensing. Use the contact form below
+        with your offer or idea and we&apos;ll take it from there. Funds would
+        be held in <GlossaryTrigger term="Escrow">escrow</GlossaryTrigger> until
+        both parties confirm.
+      </>
+    ),
   },
   {
     q: "How is the Pi price shown on this site calculated?",
-    a: "The price ticker shows illustrative market data stored locally for demonstration. The real Pi value depends on Mainnet exchange listings, liquidity and adoption — always do your own research before transacting.",
+    a: (
+      <>
+        The price ticker shows illustrative market data stored locally for
+        demonstration. The real Pi value depends on{" "}
+        <GlossaryTrigger term="Mainnet">Mainnet</GlossaryTrigger> exchange
+        listings, liquidity and adoption — always do your own research before
+        transacting.
+      </>
+    ),
   },
   {
     q: "Do I need to be a Pi pioneer to use these domains?",
-    a: "You don't need to be a pioneer to inquire, but to actually resolve and use a .pi domain inside the Pi Network you'll need a Pi wallet and a verified Pi account. The onboarding is designed to be friendly for newcomers.",
+    a: (
+      <>
+        You don&apos;t need to be a{" "}
+        <GlossaryTrigger term="Pioneer">pioneer</GlossaryTrigger> to inquire,
+        but to actually resolve and use a .pi domain inside the Pi Network
+        you&apos;ll need a{" "}
+        <GlossaryTrigger term="Pi wallet">Pi wallet</GlossaryTrigger> and a
+        verified Pi account. The onboarding is designed to be friendly for
+        newcomers.
+      </>
+    ),
   },
   {
     q: "Will you develop these domains yourself?",
-    a: "Yes for several of them — kinyanjui.pi, soko.pi, pioneerhub.pi and piart.pi are in active development. For the rest, I'm open to co-founders, builders and investors who want to bring them to life.",
+    a: (
+      <>
+        Yes for several of them — kinyanjui.pi, soko.pi, pioneerhub.pi and
+        piart.pi are in active development. For the rest, I&apos;m open to
+        co-founders, builders and investors who want to bring them to life.
+      </>
+    ),
   },
   {
     q: "Is this site affiliated with the Pi Core Team?",
-    a: "No. This is an independent pioneer-run portfolio. Pi Network and the Pi logo are properties of their respective owners; this site simply participates in and celebrates the ecosystem.",
+    a: (
+      <>
+        No. This is an independent pioneer-run portfolio. Pi Network and the Pi
+        logo are properties of their respective owners; this site simply
+        participates in and celebrates the ecosystem. The network is secured by{" "}
+        <GlossaryTrigger term="Security circle">
+          security circles
+        </GlossaryTrigger>{" "}
+        and <GlossaryTrigger term="Node">nodes</GlossaryTrigger> run by the
+        community.
+      </>
+    ),
   },
 ];
 
@@ -42,25 +96,22 @@ export function Faq() {
   return (
     <section id="faq" className="relative scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center">
+        <div className="mb-4 flex items-center justify-center">
           <PiGlossary />
         </div>
-        <div className="text-center">
-          <Badge
-            variant="outline"
-            className="mb-3 gap-1.5 rounded-full border-pi-rose/30 bg-pi-rose/10 px-3 py-1 text-xs font-medium text-pi-rose"
-          >
-            <HelpCircle className="h-3.5 w-3.5" />
-            FAQ
-          </Badge>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            Questions, answered
-          </h2>
-          <p className="mt-3 text-pretty text-muted-foreground">
-            Everything you might want to know about .pi domains and this
-            portfolio. Need a term defined? Tap the glossary above.
-          </p>
-        </div>
+        <SectionHeader
+          n="07"
+          sectionId="faq"
+          align="center"
+          badge={{ icon: HelpCircle, label: "FAQ", color: "rose" }}
+          title="Questions, answered"
+          description={
+            <>
+              Everything you might want to know about .pi domains and this
+              portfolio. Need a term defined? Tap the glossary above.
+            </>
+          }
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}

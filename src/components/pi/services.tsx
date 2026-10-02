@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "./section-header";
 
 const SERVICES = [
   {
@@ -73,23 +74,24 @@ export function Services() {
   return (
     <section id="services" className="relative scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <Badge
-            variant="outline"
-            className="mb-3 gap-1.5 rounded-full border-pi-gold/30 bg-pi-gold/10 px-3 py-1 text-xs font-medium text-pi-gold"
-          >
-            <Megaphone className="h-3.5 w-3.5" />
-            Use cases
-          </Badge>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            What these domains can{" "}
-            <span className="text-gradient-gold">become</span>
-          </h2>
-          <p className="mt-3 text-pretty text-muted-foreground">
-            Each .pi name is a seed. Here&apos;s the forest it can grow into —
-            ready to develop or partner on.
-          </p>
-        </div>
+        <SectionHeader
+          n="03"
+          sectionId="services"
+          align="center"
+          badge={{ icon: Megaphone, label: "Use cases", color: "gold" }}
+          title={
+            <>
+              What these domains can{" "}
+              <span className="text-gradient-gold">become</span>
+            </>
+          }
+          description={
+            <>
+              Each .pi name is a seed. Here&apos;s the forest it can grow into —
+              ready to develop or partner on.
+            </>
+          }
+        />
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s, i) => (

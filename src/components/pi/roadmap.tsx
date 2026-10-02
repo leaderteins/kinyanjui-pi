@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check, Circle, Compass } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "./section-header";
 
 const MILESTONES = [
   {
@@ -67,22 +68,23 @@ export function Roadmap() {
     >
       <div className="pointer-events-none absolute -left-32 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-pi-purple/15 blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <Badge
-            variant="outline"
-            className="mb-3 gap-1.5 rounded-full border-pi-purple/30 bg-pi-purple/10 px-3 py-1 text-xs font-medium text-pi-purple"
-          >
-            <Compass className="h-3.5 w-3.5" />
-            Roadmap
-          </Badge>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            From pioneer to <span className="text-gradient-purple">builder</span>
-          </h2>
-          <p className="mt-3 text-pretty text-muted-foreground">
-            A transparent look at where the portfolio has been and where it&apos;s
-            headed on the Pi Network.
-          </p>
-        </div>
+        <SectionHeader
+          n="05"
+          sectionId="roadmap"
+          align="center"
+          badge={{ icon: Compass, label: "Roadmap", color: "purple" }}
+          title={
+            <>
+              From pioneer to <span className="text-gradient-purple">builder</span>
+            </>
+          }
+          description={
+            <>
+              A transparent look at where the portfolio has been and where it&apos;s
+              headed on the Pi Network.
+            </>
+          }
+        />
 
         <div className="relative mt-12">
           {/* vertical line */}

@@ -10,6 +10,7 @@ import {
   Rocket,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "./section-header";
 
 const PILLARS = [
   {
@@ -52,25 +53,29 @@ export function AboutPi() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <Badge
-              variant="outline"
-              className="mb-3 gap-1.5 rounded-full border-pi-teal/30 bg-pi-teal/10 px-3 py-1 text-xs font-medium text-pi-teal"
-            >
-              <Coins className="h-3.5 w-3.5" />
-              About the Pi Network
-            </Badge>
-            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-              A digital currency built for{" "}
-              <span className="text-gradient-gold">everyday people</span>.
-            </h2>
-            <p className="mt-4 text-pretty text-muted-foreground">
-              Pi Network was launched in 2019 by a team of Stanford graduates
-              with a radical idea: what if mining didn&apos;t require expensive
-              hardware? Today, tens of millions of pioneers around the globe
-              secure the network from their phones — and{" "}
-              <span className="font-mono font-semibold text-foreground">.pi</span>{" "}
-              domains are how they claim their slice of the ecosystem.
-            </p>
+            <SectionHeader
+              n="02"
+              sectionId="about"
+              badge={{ icon: Coins, label: "About the Pi Network", color: "teal" }}
+              title={
+                <>
+                  A digital currency built for{" "}
+                  <span className="text-gradient-gold">everyday people</span>.
+                </>
+              }
+              description={
+                <>
+                  Pi Network was launched in 2019 by a team of Stanford graduates
+                  with a radical idea: what if mining didn&apos;t require expensive
+                  hardware? Today, tens of millions of pioneers around the globe
+                  secure the network from their phones — and{" "}
+                  <span className="font-mono font-semibold text-foreground">
+                    .pi
+                  </span>{" "}
+                  domains are how they claim their slice of the ecosystem.
+                </>
+              }
+            />
 
             <div className="mt-6 rounded-2xl border border-border/60 bg-background/60 p-5 backdrop-blur-sm">
               <div className="flex items-center gap-3">
