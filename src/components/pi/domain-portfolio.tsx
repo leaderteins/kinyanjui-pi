@@ -51,6 +51,7 @@ import { MakeOfferModal } from "./make-offer-modal";
 import { CompareSheet } from "./compare-sheet";
 import { FavoritesDrawer } from "./favorites-drawer";
 import { DomainOfTheWeek } from "./domain-of-the-week";
+import { DomainHealth } from "./domain-health";
 
 const CATEGORIES = [
   { value: "all", label: "All" },
@@ -678,6 +679,9 @@ function DomainDialog({
                   <p className="font-mono font-medium">{domain.views}</p>
                 </div>
               </div>
+
+              {/* Domain health score */}
+              <DomainHealth domainName={domain.name} />
 
               <DialogFooter className="flex-col gap-2 sm:flex-row sm:gap-2">
                 <Button

@@ -216,8 +216,18 @@ function MiniStat({
   const mv = useMotionValue(0);
   const [display, setDisplay] = React.useState("0");
   const ref = React.useRef<HTMLDivElement>(null);
+  const prevValue = React.useRef(0);
 
   React.useEffect(() => {
+    // Skip the flash on the initial mount (0 → value); only flash on updates
+    if (prevValue.current !== 0 && prevValue.current !== value && ref.current) {
+      ref.current.classList.remove("stat-flash");
+      // Force reflow to restart the animation
+      void ref.current.offsetWidth;
+      ref.current.classList.add("stat-flash");
+    }
+    prevValue.current = value;
+
     const controls = motionAnimate(mv, value, {
       duration: 1.1,
       ease: "easeOut",
@@ -229,7 +239,7 @@ function MiniStat({
   return (
     <div
       ref={ref}
-      className="rounded-2xl border border-border/60 bg-background/60 p-4 backdrop-blur-sm"
+      className="rounded-2xl border border-border/60 bg-background/60 p-4 backdrop-blur-sm transition-colors"
     >
       <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${bg} ${accent}`}>
         <Icon className="h-4 w-4" />

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { SectionHeader } from "./section-header";
+import { GlossaryText } from "./glossary-text";
 
 interface Comment {
   id: string;
@@ -281,7 +282,7 @@ function ArticleDialog({
                 {article.excerpt}
               </p>
               <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                {article.body}
+                <GlossaryText text={article.body} />
               </p>
               <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
                 <span className="font-mono text-xs text-muted-foreground">

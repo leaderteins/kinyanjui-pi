@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { PiLogo } from "./pi-logo";
 import { StarfieldCanvas } from "./starfield-canvas";
+import { LightsOffToggle } from "./lights-off-toggle";
 
 interface LookupResult {
   label: string;
@@ -165,7 +166,7 @@ export function Hero() {
               )}
             </motion.form>
 
-            {/* Trust row */}
+            {/* Trust row + lights off */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
@@ -184,6 +185,7 @@ export function Hero() {
                 <Sparkles className="h-4 w-4 text-pi-teal" />
                 Pioneer since 2021
               </span>
+              <LightsOffToggle />
             </motion.div>
           </div>
 

@@ -439,3 +439,61 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The animated count-up runs on every value change; for the 30s auto-refresh, this creates a subtle pulse effect which is nice but could be made more dramatic with a brief highlight flash.
 - Next-step feature ideas: a "Pi glossary" integration into blog article bodies (inline triggers), a dark "lights off" hero toggle, a newsletter archive, a domain "favorite" count sync (show how many others favorited a domain), a "domain health score" widget (combining views + favorites + inquiries), and a testimonial submission flow for pioneers.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 8
+Agent: main (Z.ai Code) — webDevReview cron round 7
+Task: QA the existing site, then add new features (domain health score, lights-off toggle, glossary in article bodies, stat flash) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–7) — site had 11 sections with domain deep-link, domain of the week, animated count-up, blog SectionHeader, favorites, recently viewed, wallet balance in offer modal, social share, wallet connect, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, back-to-top.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Domain health score widget (src/components/pi/domain-health.tsx + GET /api/domain-health):
+   - A new API endpoint computes a 0–100 health score per domain combining: engagement (views, up to 40 pts), inquiries (up to 30 pts), featured status (15 pts), market readiness (for-sale + price, 15 pts), and development bonus (5 pts).
+   - Returns a grade (Excellent/Strong/Growing/Emerging/New) + a weighted breakdown array.
+   - The DomainHealth component renders a radial gauge (animated SVG circle with gradient stroke) showing the score out of 100, a grade badge, and animated breakdown bars (per-component progress bars with accent colors).
+   - Integrated into the domain detail dialog, below the status/views grid and above the footer buttons.
+   - Fetches on dialog open; loading skeleton "Computing health score…".
+2. "Lights off" dark hero toggle (lights-off-toggle.tsx):
+   - A toggle button in the hero trust row that dims the hero background for a cinematic focus mode.
+   - Toggles a `.lights-off` class on the hero section, which applies a radial gradient overlay (transparent center → dimmed edges) with a 0.6s fade-in animation.
+   - Persisted to localStorage; hydration-safe (renders null until mounted).
+3. Glossary triggers in blog article bodies (glossary-text.tsx + integration in blog.tsx):
+   - A new GlossaryText component that takes plain text and auto-wraps known glossary terms (Pi Network, .pi domain, Pioneer, Security circle, Mainnet, Node, Pi wallet, Escrow) in clickable GlossaryTrigger popovers.
+   - Uses a single regex (case-insensitive, word-bounded, longest-match-first) to find and wrap terms without breaking the text flow.
+   - Applied to the article body in the blog detail dialog — terms like "Pi wallet" in the article text are now dotted-underline gold links that open a popover with the definition.
+4. Highlight flash on count-up stats (ecosystem-pulse.tsx MiniStat + globals.css):
+   - When the ecosystem pulse stats update (on the 30s auto-refresh), the MiniStat card now briefly flashes gold (a `stat-flash` CSS animation: gold background → transparent over 1.5s).
+   - Skips the flash on initial mount (0 → value); only triggers on actual value changes.
+   - Uses a ref + forced reflow to restart the animation on each update.
+
+Styling improvements:
+- Domain health gauge: gradient stroke (gold → purple), animated fill, centered score number with grade badge + breakdown bars.
+- Lights-off overlay: radial gradient dim with smooth fade-in.
+- Article body glossary terms: dotted-underline gold links.
+- Stat cards: transition-colors + flash animation for visual feedback on updates.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all 11 sections present.
+- Lights-off toggle: clicked "Turn lights off" → hero got `.lights-off` class (verified: `hasLightsOff: true`) → label changed to "Turn lights on" → clicked again → class removed (`hasLightsOff: false`).
+- Domain health score: opened soko.pi detail dialog → "Domain health score" heading appeared → radial gauge showed score "34" out of 100, "Emerging" grade, breakdown bars (Engagement 14/40, Featured 15/15, Development 5/5), and "0 inquiries · 7 views · featured" summary. Verified API: GET /api/domain-health?name=soko.pi returned {score:34, grade:"Emerging", breakdown:[...]}.
+- Glossary in article bodies: opened "Why .pi domains are the identity layer Pi was missing" article → body text contained a clickable "Pi wallet" glossary trigger button → clicking it opened a popover with "Pi wallet" title, "Where you hold Pi" short label, and the full definition.
+- Stat flash: the ecosystem pulse MiniStat cards have the `stat-flash` class + transition-colors applied (will flash gold on 30s refresh value changes).
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new features: domain health score (API + radial gauge widget), lights-off hero toggle, glossary-triggers-in-article-bodies (auto-wrapping), stat-flash highlight.
+- 3 new components: DomainHealth, LightsOffToggle, GlossaryText.
+- 1 new API route (/api/domain-health).
+- 2 new CSS utilities: .lights-off overlay + .stat-flash animation.
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The health score weights are hardcoded; could expose them as env vars or an admin config for tuning.
+- The lights-off mode only dims the hero; could extend to dim the entire page (true "focus mode").
+- The GlossaryText regex matches terms in all article bodies automatically; some articles may have terms that read awkwardly when wrapped — a manual opt-out per article could help.
+- Next-step feature ideas: a "domain comparison winner" with a detailed rationale (not just price), a "Pi wallet balance" integration into the domain cards (show a "you can afford this" badge), a newsletter archive section, a testimonial submission flow, an animated "Pi mining simulator" widget, and a "domain acquisition funnel" stepper (browse → favorite → compare → offer → connect wallet).
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
