@@ -551,3 +551,60 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The full-page lights-off dims everything except the header+hero; the ScrollProgress bar and BackToTop FAB are also dimmed — could exclude fixed elements.
 - Next-step feature ideas: a "domain acquisition funnel" stepper (browse → favorite → compare → offer → connect wallet), a "Pi wallet balance" integration into the mining sim (mine → see balance grow), a newsletter archive section, a testimonial submission flow, a "domain recommendation engine" (suggest domains based on wallet balance + interests), and an animated "Pi ecosystem map" visualization.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 10
+Agent: main (Z.ai Code) — webDevReview cron round 9
+Task: QA the existing site, then add new features (domain recommendation engine, mining→wallet integration, acquisition funnel stepper) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–9) — site had 11 sections with Pi mining simulator, affordability badges, full-page lights-off, domain health score, lights-off toggle, glossary in article bodies, stat flash, domain deep-link, domain of the week, animated count-up, blog SectionHeader, favorites, recently viewed, wallet balance in offer modal, social share, wallet connect, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, back-to-top.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Domain recommendation engine (src/components/pi/recommendation-engine.tsx + GET /api/recommendations):
+   - A new API endpoint scores every domain against the connected wallet balance + category interests.
+   - Scoring: affordability (within budget +40 pts, close to budget +15), category interest match (+25), featured (+15), engagement/views (up to +15), for-sale (+10), developed (+8).
+   - Returns top 3 domains with score + reasons array (e.g. "matches your interest in marketplace", "currently for sale", "within your budget").
+   - The RecommendationEngine component: 6 interest category chips (Marketplace, Community, DeFi, NFT, Utility, Personal), refresh button, live balance display, top-3 recommendation cards with emoji, name, price, tagline, and reason badges.
+   - Fetches reactively when wallet balance or interests change.
+   - Placed in a new "Domains picked for you" section (id="recommend") with a 2-col layout: info card | recommendation engine.
+2. Mining simulator → wallet integration (mining-simulator.tsx + wallet-state.ts):
+   - A new `addPiToWallet(amount)` helper in wallet-state.ts adds earned Pi to the connected wallet's balance (persists to localStorage + broadcasts the change event).
+   - The mining simulator calls `addPiToWallet(earned)` after each successful mining session.
+   - Verified: wallet balance went from 1,247.83 π → 1,251.0767 π after mining 3.2467 π (exact match). The wallet menu dropdown reactively shows the updated balance.
+3. Domain acquisition funnel stepper (src/components/pi/acquisition-funnel.tsx):
+   - A visual 5-step stepper showing the acquisition journey: Browse → Favorite → Compare → Offer → Connect.
+   - Each step has an icon, a numbered badge (gradient gold→purple), a label, and a description.
+   - Desktop: horizontal layout with gradient connector lines between steps. Mobile: stacked grid.
+   - Bottom hint: "Every step is available on this page — use ⌘K to jump to any section."
+   - Placed between the Stats section and the Domain Portfolio.
+
+Styling improvements:
+- Acquisition funnel: gradient step badges, connector lines, numbered progression.
+- Recommendation engine: interest chips with emoji + active gold state, reason badges per recommendation, animated card entrance.
+- New "Domains picked for you" section: 2-col layout with info card + recommendation widget.
+- The page now has 12 sections (added "recommend").
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; 12 sections present (added "recommend").
+- Acquisition funnel: "The acquisition funnel" heading + 5 steps (Browse, Favorite, Compare, Offer, Connect) all rendered with numbered badges.
+- Recommendation engine: scrolled to #recommend → "Domain recommendations" heading + 6 interest chips + 3 top picks (soko.pi "matches your interest in marketplace" + "a featured portfolio domain"; piwallet.pi "matches your interest in defi" + "currently for sale"; piswap.pi "matches your interest in defi"). API /api/recommendations?balance=0&interests=marketplace,defi returned 200.
+- Mining → wallet: connected kinyanjui.pi (1,247.83 π) → cleared mining cooldown → reloaded → wallet persisted (1,247.83 π) → clicked "Tap to mine" → after 3s mining animation completed → wallet balance increased to 1,251.0767 π (exact +3.2467 π match with mining totalMined) → wallet menu dropdown showed "Balance: 1,251.077 π".
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 3 new features: domain recommendation engine (API + scoring + UI with interest chips), mining simulator → wallet integration (earned Pi adds to connected balance), domain acquisition funnel stepper.
+- 3 new components: RecommendationEngine, AcquisitionFunnel.
+- 1 new API route (/api/recommendations).
+- 1 new helper: addPiToWallet (wallet-state.ts).
+- Page now has 12 sections (added "recommend").
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The recommendation engine's scoring weights are hardcoded; could expose them as config for tuning.
+- The mining → wallet integration only works when a wallet is connected; could show a hint "connect a wallet to keep your mined Pi".
+- The acquisition funnel is static; could make it interactive (track which steps the user has completed — e.g. has favorites → step 2 done, has compared → step 3 done).
+- Next-step feature ideas: an interactive funnel progress tracker (steps light up as you complete them), a "Pi ecosystem map" visualization, a newsletter archive, a testimonial submission flow, a "domain detail" expanded view with acquisition history, and a "Pi glossary" full-page reference.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

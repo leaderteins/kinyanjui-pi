@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pickaxe, Zap, Clock, Check, Loader2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { addPiToWallet } from "@/lib/wallet-state";
 
 const STORAGE_KEY = "kinyanjui-pi-mining";
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24h
@@ -95,6 +96,8 @@ export function MiningSimulator() {
     setState(next);
     setEarnedThisSession(earned);
     setMining(false);
+    // If a wallet is connected, add the earned Pi to its balance
+    addPiToWallet(earned);
   }
 
   if (!mounted) {

@@ -51,3 +51,21 @@ export function broadcastWalletChange() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(EVENT));
 }
+
+/**
+ * Adds earned Pi to the connected wallet's balance (persists + broadcasts).
+ * Used by the mining simulator to simulate earning Pi into your wallet.
+ */
+export function addPiToWallet(amount: number) {
+  if (typeof window === "undefined") return;
+  const w = read();
+  if (!w) return;
+  w.piBalance = Number((w.piBalance + amount).toFixed(4));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(w));
+  } catch {
+    /* ignore */
+  }
+  broadcastWalletChange();
+}
+

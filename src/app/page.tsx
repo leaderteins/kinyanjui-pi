@@ -23,6 +23,8 @@ import { CommandPalette } from "@/components/pi/command-palette";
 import { BackToTop } from "@/components/pi/back-to-top";
 import { TipOfDay } from "@/components/pi/tip-of-day";
 import { MiningSimulator } from "@/components/pi/mining-simulator";
+import { RecommendationEngine } from "@/components/pi/recommendation-engine";
+import { AcquisitionFunnel } from "@/components/pi/acquisition-funnel";
 
 async function getInitialData() {
   try {
@@ -88,6 +90,7 @@ export default async function Home() {
         <Hero />
         <TickerTape />
         <Stats domainsCount={domainsCount} />
+        <AcquisitionFunnel />
         <DomainPortfolio />
         <MarketChart series={series} latest={piStats} />
 
@@ -118,6 +121,45 @@ export default async function Home() {
         <PioneerSpotlight />
         <Roadmap />
         <EcosystemPulse />
+
+        {/* Domain recommendation engine */}
+        <section id="recommend" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
+            <div className="flex flex-col justify-center">
+              <Badge
+                variant="outline"
+                className="mb-3 w-fit gap-1.5 rounded-full border-pi-gold/30 bg-pi-gold/10 px-3 py-1 text-xs font-medium text-pi-gold"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> Smart picks
+              </Badge>
+              <h2 className="text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+                Domains picked <span className="text-gradient-gold">for you</span>
+              </h2>
+              <p className="mt-3 text-pretty text-sm text-muted-foreground">
+                Our recommendation engine scores every domain in the portfolio
+                against your connected wallet balance and category interests.
+                Pick what you&apos;re curious about — the top 3 matches update
+                live. Connect a wallet for budget-aware suggestions.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-gold" />
+                  Affordability scoring (within budget / close to budget)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-purple" />
+                  Category interest matching (pick what you&apos;re into)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pi-teal" />
+                  Engagement + featured + for-sale bonuses
+                </li>
+              </ul>
+            </div>
+            <RecommendationEngine />
+          </div>
+        </section>
+
         <Blog />
         <Faq />
 
