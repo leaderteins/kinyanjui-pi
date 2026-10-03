@@ -381,3 +381,61 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The SectionHeader is applied to 5 sections; could extend to market chart, pioneers, ecosystem pulse, blog, contact for full consistency.
 - Next-step feature ideas: a "Pi glossary" integration into blog article bodies (inline triggers), a domain "detail" deep-link that opens the dialog on load via URL hash, a dark "lights off" hero toggle, animated count-up on stats when activity updates, a newsletter archive, and a "domain of the week" spotlight banner.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 7
+Agent: main (Z.ai Code) — webDevReview cron round 6
+Task: QA the existing site, then add new features (domain deep-link, domain of the week, animated count-up, blog SectionHeader) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–6) — site had 11 sections with favorites, recently viewed, wallet balance in offer modal, social share, wallet connect, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, back-to-top.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Domain deep-link via URL hash (domain-portfolio.tsx):
+   - When a URL contains `#domain=soko.pi`, the portfolio auto-opens that domain's detail dialog on page load (scrolls to #portfolio first, then opens after 600ms).
+   - Listens for both initial load AND `hashchange` events, so navigating to a deep-link from another tab or changing the hash in-place also triggers the dialog.
+   - Clears the hash after handling (`history.replaceState`) so the same deep-link can be re-triggered.
+   - A new "Share" button in the domain detail dialog footer copies the domain deep-link (`origin/pathname#domain=name`) to clipboard + toast "Domain link copied".
+2. Domain of the week spotlight (domain-of-the-week.tsx):
+   - A prominent gradient banner at the top of the portfolio section highlighting one featured domain each week (deterministic ISO-week-based pick from the featured domains).
+   - Shows the "DOMAIN OF THE WEEK" badge, emoji, domain name, tagline, price/views, and an "Explore" CTA that opens the domain detail dialog.
+   - Loading skeleton + accent-tinted gradient background matching the domain's accent color.
+3. Animated count-up on ecosystem pulse stats (ecosystem-pulse.tsx MiniStat):
+   - The MiniStat component now accepts a numeric `value` and animates from 0 to the target using framer-motion's `useMotionValue` + `animate`.
+   - When the 30-second auto-refresh updates the stats (subscribers, total views), the numbers animate smoothly to their new values.
+   - Duration: 1.1s with easeOut easing.
+4. Blog SectionHeader (blog.tsx):
+   - Replaced the hand-rolled Badge + h2 + p header with the standardized SectionHeader component (number "06", "Ecosystem dispatch" badge, title, description, share button) for full visual consistency with portfolio/about/services/roadmap/FAQ.
+
+Styling improvements:
+- Domain of the week banner: gradient background, accent-tinted badges, glow blurs.
+- Domain dialog footer: now 4 buttons (Copy name / Share / Inquire / Make an offer) in a consistent flex layout.
+- Blog section: numbered "06 — Section" header matching the rest of the page.
+
+Bug found and fixed during QA:
+- The domain deep-link initially only checked the hash on initial mount + when loading/domains changed. If the page was already loaded (domains already fetched, loading=false) and the user navigated to a `#domain=...` URL (hash-only change), the useEffect deps `[loading, domains, deepLinkHandled]` didn't change → the effect didn't re-run → the dialog never opened. Fixed by: (a) removing the `deepLinkHandled` flag, (b) extracting the hash-check logic into a `checkHash()` function, (c) calling it on mount AND adding a `hashchange` event listener, (d) clearing the hash after handling via `history.replaceState` so re-triggering works. Verified: navigating to `http://localhost:3000/#domain=soko.pi` now auto-opens the soko.pi detail dialog.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all 11 sections present.
+- Domain deep-link: navigated to `http://localhost:3000/#domain=soko.pi` → after ~2s the soko.pi detail dialog auto-opened (verified: `hasDialog: true, title: "soko.pi"` via DOM query).
+- Domain of the week: "DOMAIN OF THE WEEK" banner appeared at the top of the portfolio showing soko.pi with emoji, tagline, views, and an "Explore" button. Clicking "Explore" opened the soko.pi detail dialog.
+- Domain dialog Share button: opened soko.pi dialog → clicked "Share" → "Domain link copied" toast with `http://localhost:3000/#domain=soko.pi`.
+- Animated count-up: ecosystem pulse MiniStat showed "0" (Subscribers) and "8" (Total views) — the count-up animation runs from 0 to the target on mount and on the 30s refresh.
+- Blog SectionHeader: "06 — Section" number + "Ecosystem dispatch" badge + "News from the Pi frontier" title + "Share blog section" button all render.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new features: domain deep-link via URL hash (+ Share button in dialog), domain-of-the-week spotlight banner, animated count-up on ecosystem pulse stats, blog SectionHeader.
+- 1 new component: DomainOfTheWeek.
+- 1 bug fixed (deep-link not re-triggering on hashchange — added hashchange listener + hash clearing).
+- SectionHeader now applied to 6 sections (portfolio 01, about 02, services 03, roadmap 05, blog 06, FAQ 07) for consistent visual rhythm.
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The SectionHeader is applied to 6 sections; could extend to market chart (04), pioneers, ecosystem pulse, contact for full consistency.
+- The domain-of-the-week is a deterministic weekly pick; could add a manual override or an admin API to set the spotlight domain.
+- The animated count-up runs on every value change; for the 30s auto-refresh, this creates a subtle pulse effect which is nice but could be made more dramatic with a brief highlight flash.
+- Next-step feature ideas: a "Pi glossary" integration into blog article bodies (inline triggers), a dark "lights off" hero toggle, a newsletter archive, a domain "favorite" count sync (show how many others favorited a domain), a "domain health score" widget (combining views + favorites + inquiries), and a testimonial submission flow for pioneers.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

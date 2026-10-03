@@ -1,7 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  animate as motionAnimate,
+} from "framer-motion";
 import {
   Activity,
   Eye,
@@ -142,18 +146,14 @@ export function EcosystemPulse() {
               <MiniStat
                 icon={Mail}
                 label="Subscribers"
-                value={loading ? "—" : String(data?.subscriberCount ?? 0)}
+                value={loading ? 0 : data?.subscriberCount ?? 0}
                 accent="text-pi-purple"
                 bg="bg-pi-purple/10"
               />
               <MiniStat
                 icon={Eye}
                 label="Total views"
-                value={
-                  loading
-                    ? "—"
-                    : (data?.totalViews ?? 0).toLocaleString()
-                }
+                value={loading ? 0 : data?.totalViews ?? 0}
                 accent="text-pi-gold"
                 bg="bg-pi-gold/10"
               />
@@ -209,16 +209,34 @@ function MiniStat({
 }: {
   icon: React.ElementType;
   label: string;
-  value: string;
+  value: number;
   accent: string;
   bg: string;
 }) {
+  const mv = useMotionValue(0);
+  const [display, setDisplay] = React.useState("0");
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const controls = motionAnimate(mv, value, {
+      duration: 1.1,
+      ease: "easeOut",
+      onUpdate: (v) => setDisplay(Math.round(v).toLocaleString()),
+    });
+    return () => controls.stop();
+  }, [value, mv]);
+
   return (
-    <div className="rounded-2xl border border-border/60 bg-background/60 p-4 backdrop-blur-sm">
+    <div
+      ref={ref}
+      className="rounded-2xl border border-border/60 bg-background/60 p-4 backdrop-blur-sm"
+    >
       <span className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${bg} ${accent}`}>
         <Icon className="h-4 w-4" />
       </span>
-      <p className="mt-3 font-mono text-2xl font-bold tracking-tight">{value}</p>
+      <motion.p className="mt-3 font-mono text-2xl font-bold tracking-tight">
+        {display}
+      </motion.p>
       <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );

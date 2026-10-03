@@ -21,6 +21,7 @@ import {
   X,
   Heart,
   Clock,
+  Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MakeOfferModal } from "./make-offer-modal";
 import { CompareSheet } from "./compare-sheet";
 import { FavoritesDrawer } from "./favorites-drawer";
+import { DomainOfTheWeek } from "./domain-of-the-week";
 
 const CATEGORIES = [
   { value: "all", label: "All" },
@@ -91,6 +93,34 @@ export function DomainPortfolio() {
   React.useEffect(() => {
     load();
   }, [load]);
+
+  // Handle domain deep-link from URL hash: #domain=soko.pi
+  React.useEffect(() => {
+    if (loading || domains.length === 0) return;
+
+    function checkHash() {
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash;
+      const match = hash.match(/domain=([^&]+)/);
+      if (!match) return;
+      const name = decodeURIComponent(match[1]);
+      const found = domains.find((d) => d.name === name);
+      if (found) {
+        // Clear the hash so re-opening works
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+        setTimeout(() => {
+          document
+            .getElementById("portfolio")
+            ?.scrollIntoView({ behavior: "smooth" });
+          setTimeout(() => openDomain(found), 600);
+        }, 200);
+      }
+    }
+
+    checkHash();
+    window.addEventListener("hashchange", checkHash);
+    return () => window.removeEventListener("hashchange", checkHash);
+  }, [loading, domains]);
 
   function toFav(d: PiDomain): FavDomain {
     return {
@@ -208,6 +238,9 @@ export function DomainPortfolio() {
             )}
           </div>
         </div>
+
+        {/* Domain of the week spotlight */}
+        <DomainOfTheWeek onOpenDomain={openDomain} />
 
         {/* Recently viewed strip */}
         {recent.length > 0 && (
@@ -656,6 +689,20 @@ function DomainDialog({
                   }}
                 >
                   Copy name
+                </Button>
+                <Button
+                  variant="outline"
+                  className="sm:flex-1 gap-1.5"
+                  onClick={() => {
+                    const url = `${window.location.origin}${window.location.pathname}#domain=${encodeURIComponent(domain.name)}`;
+                    navigator.clipboard?.writeText(url);
+                    toast.success("Domain link copied", {
+                      description: url,
+                    });
+                  }}
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
                 </Button>
                 <Button
                   variant="outline"

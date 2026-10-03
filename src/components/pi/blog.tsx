@@ -26,6 +26,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { SectionHeader } from "./section-header";
 
 interface Comment {
   id: string;
@@ -113,23 +114,24 @@ export function Blog() {
     <section id="blog" className="relative scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl">
-            <Badge
-              variant="outline"
-              className="mb-3 gap-1.5 rounded-full border-pi-purple/30 bg-pi-purple/10 px-3 py-1 text-xs font-medium text-pi-purple"
-            >
-              <Newspaper className="h-3.5 w-3.5" />
-              Ecosystem dispatch
-            </Badge>
-            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-              News from the{" "}
-              <span className="text-gradient-purple">Pi frontier</span>
-            </h2>
-            <p className="mt-3 text-pretty text-muted-foreground">
-              Build updates, pioneer spotlights, market views and guides —
-              straight from the portfolio. Tap any card to read the full dispatch.
-            </p>
-          </div>
+          <SectionHeader
+            n="06"
+            sectionId="blog"
+            badge={{ icon: Newspaper, label: "Ecosystem dispatch", color: "purple" }}
+            title={
+              <>
+                News from the{" "}
+                <span className="text-gradient-purple">Pi frontier</span>
+              </>
+            }
+            description={
+              <>
+                Build updates, pioneer spotlights, market views and guides —
+                straight from the portfolio. Tap any card to read the full
+                dispatch.
+              </>
+            }
+          />
 
           <div className="flex items-center gap-2 overflow-x-auto pb-1 pi-scroll">
             <Filter className="h-4 w-4 shrink-0 text-muted-foreground" />
