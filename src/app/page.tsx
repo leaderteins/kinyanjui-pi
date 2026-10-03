@@ -28,6 +28,7 @@ import { AcquisitionFunnel } from "@/components/pi/acquisition-funnel";
 import { EcosystemMap } from "@/components/pi/ecosystem-map";
 import { DeadlineBanner } from "@/components/pi/deadline-banner";
 import { ClaimTracker } from "@/components/pi/claim-tracker";
+import { DomainConnectionGuide } from "@/components/pi/domain-connection-guide";
 
 async function getInitialData() {
   try {
@@ -94,6 +95,7 @@ export default async function Home() {
         <Hero domainsCount={domainsCount} />
         <TickerTape />
         <ClaimTracker />
+        <DomainConnectionGuide />
         <Stats domainsCount={domainsCount} />
         <AcquisitionFunnel />
         <DomainPortfolio />

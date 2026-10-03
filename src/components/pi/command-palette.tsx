@@ -27,12 +27,14 @@ import {
   DollarSign,
   ShoppingCart,
   ShieldCheck,
+  Rocket,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const SECTIONS = [
   { id: "top", label: "Top", icon: Home, hint: "Home" },
   { id: "claim", label: "Claim Tracker", icon: ShieldCheck, hint: "Secure your domains" },
+  { id: "connect-guide", label: "Connection Guide", icon: Rocket, hint: "Point kinyanjui.pi here" },
   { id: "portfolio", label: "Domains", icon: Tag, hint: "Portfolio" },
   { id: "market", label: "Market", icon: DollarSign, hint: "Chart" },
   { id: "calculator", label: "Pi Converter", icon: Calculator, hint: "Calc" },

@@ -757,3 +757,45 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The 5 owned domains are hardcoded in the component; if the user acquires more, update OWNED_DOMAINS in claim-tracker.tsx.
 - Next-step feature ideas: per-domain "claim history" timeline, email/SMS reminder when the deadline approaches, a "claim all" batch flow guide, and integration with the Pi Browser deep-link protocol once available.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 14
+Agent: main (Z.ai Code) — user request: point kinyanjui.pi to this website
+Task: User has https://kinyanjuiservice7061.pinet.com (Pi-hosted app) and wants kinyanjui.pi to resolve to this website instead. Built a Domain Connection Guide explaining the deploy + DNS steps.
+
+Work Log:
+- User shared their existing Pi-hosted app URL: https://kinyanjuiservice7061.pinet.com and wants kinyanjui.pi to load this website instead.
+- Clarified the honest reality: this website runs on localhost in a sandbox — it cannot deploy itself or edit Pi domain DNS records. The actual deploy + DNS change must be done manually (deploy to a public host + configure the .pi domain in the Pi Browser).
+- Built a DomainConnectionGuide component (src/components/pi/domain-connection-guide.tsx):
+  - A clear "Current → Target" comparison: kinyanjuiservice7061.pinet.com (Pi-hosted app) → kinyanjui.pi (this website, after deploy), with an animated arrow between them.
+  - 4 numbered steps with icons, descriptions, info notes, and CTA links:
+    1. Deploy this website to a public host (Vercel/Netlify) — "Deploy to Vercel" link to vercel.com/new.
+    2. Open kinyanjui.pi in the Pi Browser → Domains settings — "Open Pi Browser" link to minepi.com/pi-browser.
+    3. Point the domain to your deployed URL (set the target/resolution/redirect record in Pi Browser domain settings).
+    4. Verify + retire the old pinet.com app.
+  - Each step has a colored icon (gold/purple/teal/rose), a numbered badge, a description, and an info note box.
+  - Honest disclaimer at the bottom: "This guide does the explaining — not the configuring. This website is a showcase and cannot deploy itself or edit your Pi domain records. You must complete steps 1–4 manually. The Pi Browser is the only place that can change what kinyanjui.pi resolves to."
+- Placed the guide right after the ClaimTracker (so the claim + connect guides are together, high on the page).
+- Added "Connection Guide" to the command palette (3rd option, Rocket icon) so users can jump to it via ⌘K.
+
+Verification (agent-browser):
+- Page loads clean; no console/runtime errors.
+- Scrolled to #connect-guide → "Point kinyanjui.pi to this website" heading + "You currently have an app at https://kinyanjuiservice7061.pinet.com" link (opens new tab) + "Here's how to switch it..." description.
+- Current→Target comparison rendered: "CURRENT kinyanjuiservice7061.pinet.com (Pi-hosted app)" → animated arrow → "TARGET kinyanjui.pi (This website, after deploy)".
+- All 4 steps rendered with headings, descriptions, info notes, and CTA links (Deploy to Vercel → vercel.com/new, Open Pi Browser → minepi.com/pi-browser).
+- Disclaimer rendered: "This guide does the explaining — not the configuring. This website is a showcase and cannot deploy itself or edit your Pi domain records..."
+- Command palette: "Connection Guide #connect-guide" appears as the 3rd option.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 1 new component: DomainConnectionGuide — a 4-step guide explaining how to point kinyanjui.pi to this website (deploy → open Pi Browser → set DNS → verify), with the user's existing pinet.com URL captured as "Current".
+- Added to the command palette.
+- Placed right after the ClaimTracker.
+- All features QA-verified via agent-browser; lint clean; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- This guide is explanatory only; the actual deploy + DNS configuration must be done manually by the user.
+- The pinet.com URL is hardcoded in the component; could be made editable or stored in a config if the user's app URL changes.
+- Next-step feature ideas: a "deploy checklist" with checkboxes that persist (like the ClaimTracker), a "deployment status" badge that the user can update once they've deployed, and integration with the Pi SDK's domain resolution API once it's publicly documented.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
