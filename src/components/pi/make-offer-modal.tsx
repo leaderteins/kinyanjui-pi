@@ -109,6 +109,12 @@ export function MakeOfferModal({ domain, open, onOpenChange }: MakeOfferModalPro
       }
       setDone(true);
       toast.success("Offer submitted! I'll reply from kinyanjui.pi.");
+      // Track offer-made for the acquisition funnel progress
+      try {
+        localStorage.setItem("kinyanjui-pi-offer-made", "true");
+      } catch {
+        /* ignore */
+      }
     } catch {
       toast.error("Network error — please try again.");
     } finally {

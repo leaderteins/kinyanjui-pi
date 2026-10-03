@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pickaxe, Zap, Clock, Check, Loader2, Sparkles } from "lucide-react";
+import { Pickaxe, Zap, Clock, Check, Loader2, Sparkles, Wallet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { addPiToWallet } from "@/lib/wallet-state";
+import { addPiToWallet, useWalletState } from "@/lib/wallet-state";
 
 const STORAGE_KEY = "kinyanjui-pi-mining";
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24h
@@ -78,6 +78,7 @@ export function MiningSimulator() {
     ? Math.max(0, SESSION_DURATION - (now - state.lastMined))
     : 0;
   const canMine = !state.lastMined || cooldownLeft <= 0;
+  const { wallet } = useWalletState();
 
   async function mine() {
     if (!canMine || mining) return;
@@ -132,6 +133,27 @@ export function MiningSimulator() {
           {BASE_RATE} π/hr
         </Badge>
       </div>
+
+      {/* Wallet connection hint */}
+      {!wallet && (
+        <div className="relative mt-3 flex items-center gap-2 rounded-lg border border-dashed border-pi-gold/30 bg-pi-gold/5 px-3 py-2 text-[11px] text-muted-foreground">
+          <Wallet className="h-3.5 w-3.5 shrink-0 text-pi-gold" />
+          <span>
+            <span className="font-medium text-foreground/80">Connect a wallet</span>{" "}
+            to save your mined Pi to a balance.
+          </span>
+        </div>
+      )}
+      {wallet && (
+        <div className="relative mt-3 flex items-center gap-2 rounded-lg border border-pi-teal/30 bg-pi-teal/5 px-3 py-2 text-[11px] text-pi-teal">
+          <Wallet className="h-3.5 w-3.5 shrink-0" />
+          <span>
+            Mined Pi will be added to{" "}
+            <span className="font-mono font-semibold">{wallet.handle}</span> (balance:{" "}
+            {wallet.piBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} π)
+          </span>
+        </div>
+      )}
 
       {/* Mining button / progress */}
       <div className="relative mt-5">

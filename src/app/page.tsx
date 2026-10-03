@@ -25,6 +25,7 @@ import { TipOfDay } from "@/components/pi/tip-of-day";
 import { MiningSimulator } from "@/components/pi/mining-simulator";
 import { RecommendationEngine } from "@/components/pi/recommendation-engine";
 import { AcquisitionFunnel } from "@/components/pi/acquisition-funnel";
+import { EcosystemMap } from "@/components/pi/ecosystem-map";
 
 async function getInitialData() {
   try {
@@ -118,6 +119,7 @@ export default async function Home() {
 
         <AboutPi />
         <Services />
+        <EcosystemMap />
         <PioneerSpotlight />
         <Roadmap />
         <EcosystemPulse />

@@ -175,6 +175,15 @@ export function DomainPortfolio() {
     });
   }
 
+  // Track compare count in localStorage for the acquisition funnel progress
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("kinyanjui-pi-compare-count", String(compareIds.length));
+    } catch {
+      /* ignore */
+    }
+  }, [compareIds]);
+
   const compareDomains = domains.filter((d) => compareIds.includes(d.id));
 
   function inquireFromCompare(d: PiDomain) {

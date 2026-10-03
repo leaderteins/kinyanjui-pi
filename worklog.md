@@ -608,3 +608,62 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The acquisition funnel is static; could make it interactive (track which steps the user has completed — e.g. has favorites → step 2 done, has compared → step 3 done).
 - Next-step feature ideas: an interactive funnel progress tracker (steps light up as you complete them), a "Pi ecosystem map" visualization, a newsletter archive, a testimonial submission flow, a "domain detail" expanded view with acquisition history, and a "Pi glossary" full-page reference.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 11
+Agent: main (Z.ai Code) — webDevReview cron round 10
+Task: QA the existing site, then add new features (interactive acquisition funnel, Pi ecosystem map, mining wallet hint) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–10) — site had 12 sections with domain recommendation engine, mining→wallet integration, acquisition funnel stepper, Pi mining simulator, affordability badges, full-page lights-off, domain health score, lights-off toggle, glossary in article bodies, stat flash, domain deep-link, domain of the week, animated count-up, blog SectionHeader, favorites, recently viewed, wallet balance in offer modal, social share, wallet connect, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, back-to-top.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 12 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Interactive acquisition funnel (acquisition-funnel.tsx):
+   - The funnel is now interactive — steps light up as the user completes them:
+     - Step 1 (Browse): always done (you've seen the page).
+     - Step 2 (Favorite): done when useFavorites().count > 0.
+     - Step 3 (Compare): done when compare count >= 2 (tracked via localStorage "kinyanjui-pi-compare-count", written by domain-portfolio on toggle).
+     - Step 4 (Offer): done when an offer has been submitted (tracked via localStorage "kinyanjui-pi-offer-made", written by make-offer-modal on submit).
+     - Step 5 (Connect): done when useWalletState().wallet is set.
+   - Each completed step shows a teal check icon, a "✓ DONE" label, a teal ring pulse animation, and a teal connector line to the next step.
+   - A progress indicator in the header shows "X / 5" + "in progress" or "Complete!".
+   - The bottom hint updates dynamically: "X steps to go — keep exploring" or "You've completed every step — you're ready to acquire a .pi domain!"
+   - Steps are now clickable links (anchor tags) that scroll to #portfolio.
+2. Pi ecosystem map visualization (ecosystem-map.tsx):
+   - A new "The .pi ecosystem at a glance" section (id="ecosystem") with an interactive SVG node graph.
+   - kinyanjui.pi is the central hub (gold, larger node with radial glow), with 7 domain nodes radiating outward across 4 category branches (Marketplace: soko, kilimo; Community: pioneerhub; DeFi: piwallet, mali, piswap; NFT: piart).
+   - 7 connecting edges (animated pathLength draw-in). Hovering a node: highlights its edges (solid gold), shows a pulse ring animation, and dims unrelated nodes to 30% opacity.
+   - A side legend panel shows the category branches with color dots + domain names, plus a hub info card showing node/connection counts.
+   - Uses the SectionHeader component (n="08") for consistent visual rhythm.
+3. Mining simulator wallet hint (mining-simulator.tsx):
+   - When no wallet is connected: a dashed gold hint "Connect a wallet to save your mined Pi to a balance."
+   - When a wallet is connected: a teal hint "Mined Pi will be added to {handle} (balance: X π)" — reactively updates on wallet connect/disconnect.
+
+Styling improvements:
+- Interactive funnel: completed steps get teal check icons, pulse rings, "✓ DONE" labels, and teal connector lines; progress badge in the header.
+- Ecosystem map: SVG node graph with radial hub glow, animated edge draw-in, hover highlight + pulse rings + node dimming, category legend panel.
+- Mining simulator: conditional gold/teal wallet hint banners.
+- Page now has 13 sections (added "ecosystem").
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; 13 sections present (added "ecosystem").
+- Interactive funnel: initial state showed step 1 "Browse ✓ DONE" + progress "1/5 in progress" → favorited a domain → step 2 "Favorite ✓ DONE" lit up + progress became "2/5" + "3 steps to go" → connected wallet → step 5 "Connect ✓ DONE" lit up. Completed steps showed teal check icons, "✓ DONE" labels, and pulse rings.
+- Ecosystem map: scrolled to #ecosystem → "The .pi ecosystem at a glance" heading + SVG rendered with 9 circles, 7 lines, 16 text elements (verified via DOM query). All 8 domain nodes visible (kinyanjui.pi hub + 7 connected). Category branches legend showed Marketplace (soko.pi, kilimo.pi), Community, DeFi, NFT with color dots.
+- Mining wallet hint: with no wallet → "Connect a wallet to save your mined Pi to a balance." → connected kinyanjui.pi → hint changed to "Mined Pi will be added to kinyanjui.pi (balance: 1,247.83 π)" (reactive).
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 3 new features: interactive acquisition funnel (tracks real user progress via favorites/compare/offer/wallet), Pi ecosystem map visualization (interactive SVG node graph), mining simulator wallet hint (reactive to wallet state).
+- 1 new component: EcosystemMap.
+- 1 new section (id="ecosystem") — page now has 13 sections.
+- domain-portfolio + make-offer-modal updated to write progress to localStorage for the funnel.
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The ecosystem map nodes are positioned with hardcoded coordinates; could be auto-laid-out from the DB for new domains.
+- The funnel "Offer" step tracks any offer ever made (localStorage flag); could track per-domain or allow reset.
+- The ecosystem map could be made clickable (clicking a node opens the domain detail dialog).
+- Next-step feature ideas: a newsletter archive section, a testimonial submission flow, a "Pi glossary" full-page reference, a domain acquisition history timeline (per-user), an animated "Pi blockchain" block explorer demo, and a "domain investment calculator" (project returns based on views/growth).
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
