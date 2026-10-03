@@ -45,6 +45,7 @@ import {
   useRecentlyViewed,
   type FavDomain,
 } from "@/lib/pi-storage";
+import { useWalletState } from "@/lib/wallet-state";
 import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 import { MakeOfferModal } from "./make-offer-modal";
@@ -422,6 +423,9 @@ function DomainCard({
   const accent = ACCENT_STYLES[domain.accent] ?? ACCENT_STYLES.gold;
   const statusLabel = STATUS_LABELS[domain.status] ?? domain.status;
   const catLabel = CATEGORY_LABELS[domain.category] ?? domain.category;
+  const { wallet } = useWalletState();
+  const affordable =
+    wallet && domain.pricePi ? wallet.piBalance >= domain.pricePi : null;
 
   // 3D tilt + cursor-follow glow
   const mx = useMotionValue(0.5);
@@ -576,9 +580,22 @@ function DomainCard({
           {catLabel}
         </span>
         {domain.pricePi ? (
-          <span className="font-mono font-semibold text-foreground">
-            {domain.pricePi.toLocaleString()} π
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span className="font-mono font-semibold text-foreground">
+              {domain.pricePi.toLocaleString()} π
+            </span>
+            {affordable !== null && (
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
+                  affordable
+                    ? "bg-pi-teal/15 text-pi-teal"
+                    : "bg-pi-rose/15 text-pi-rose"
+                }`}
+              >
+                {affordable ? "✓ Affordable" : "Over budget"}
+              </span>
+            )}
+          </div>
         ) : (
           <span className="inline-flex items-center gap-1">
             <Eye className="h-3 w-3" /> {domain.views} views

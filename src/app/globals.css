@@ -246,6 +246,20 @@
   to { opacity: 1; }
 }
 
+/* Full-page focus mode — dims everything except the hero for cinematic effect */
+.lights-off-page {
+  position: relative;
+}
+.lights-off-page > *:not(header):not(.lights-off) {
+  opacity: 0.35;
+  filter: blur(0.5px);
+  transition: opacity 0.6s ease-out, filter 0.6s ease-out;
+}
+.lights-off-page > *:not(header):not(.lights-off):hover {
+  opacity: 1;
+  filter: none;
+}
+
 /* Highlight flash when count-up stats update */
 @keyframes stat-flash {
   0% { background-color: color-mix(in oklab, var(--pi-gold) 20%, transparent); }

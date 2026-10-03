@@ -28,11 +28,12 @@ export function LightsOffToggle() {
     } catch {
       /* ignore */
     }
-    // Toggle a class on the hero section for the cinematic dim
+    // Toggle the cinematic dim on both the hero and the full page body
     const hero = document.getElementById("top");
     if (hero) {
       hero.classList.toggle("lights-off", next);
     }
+    document.body.classList.toggle("lights-off-page", next);
   }
 
   if (!mounted) return null;

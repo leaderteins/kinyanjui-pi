@@ -22,6 +22,7 @@ import { PiCalculator } from "@/components/pi/pi-calculator";
 import { CommandPalette } from "@/components/pi/command-palette";
 import { BackToTop } from "@/components/pi/back-to-top";
 import { TipOfDay } from "@/components/pi/tip-of-day";
+import { MiningSimulator } from "@/components/pi/mining-simulator";
 
 async function getInitialData() {
   try {
@@ -90,9 +91,10 @@ export default async function Home() {
         <DomainPortfolio />
         <MarketChart series={series} latest={piStats} />
 
-        {/* Pi converter alongside tip of the day + recap */}
+        {/* Pi mining simulator + converter + tip */}
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid items-stretch gap-5 lg:grid-cols-3">
+            <MiningSimulator />
             <div id="calculator" className="scroll-mt-20">
               <PiCalculator
                 priceUsd={piStats.priceUsd}
@@ -100,37 +102,14 @@ export default async function Home() {
               />
             </div>
             <TipOfDay />
-            <div className="flex flex-col justify-center rounded-2xl border border-border/60 bg-card/30 p-6 backdrop-blur-sm">
-              <Badge
-                variant="outline"
-                className="mb-3 w-fit gap-1.5 rounded-full border-pi-gold/30 bg-pi-gold/10 px-3 py-1 text-xs font-medium text-pi-gold"
-              >
-                <Sparkles className="h-3.5 w-3.5" /> Try the math
-              </Badge>
-              <h3 className="text-balance text-2xl font-bold tracking-tight">
-                What could your Pi be{" "}
-                <span className="text-gradient-gold">worth?</span>
-              </h3>
-              <p className="mt-3 text-pretty text-sm text-muted-foreground">
-                Plug an amount into the converter to see USD equivalents at the
-                current illustrative rate. Whether you&apos;re sizing a domain
-                offer or pricing a marketplace listing, the math is one tap away.
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pi-gold" />
-                  Real-time rate from the portfolio ticker
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pi-purple" />
-                  Quick-amount presets for fast sizing
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pi-teal" />
-                  Bidirectional — flip π ↔ USD instantly
-                </li>
-              </ul>
-            </div>
+          </div>
+          <div className="mt-5 flex items-center justify-center gap-2 rounded-2xl border border-border/60 bg-card/30 p-4 text-sm text-muted-foreground">
+            <Sparkles className="h-4 w-4 text-pi-gold" />
+            <span>
+              <span className="font-semibold text-foreground">Try the math</span> —
+              the converter shows USD equivalents at the current illustrative
+              rate. Mine simulated Pi above, then convert it below.
+            </span>
           </div>
         </section>
 

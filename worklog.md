@@ -497,3 +497,57 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The GlossaryText regex matches terms in all article bodies automatically; some articles may have terms that read awkwardly when wrapped — a manual opt-out per article could help.
 - Next-step feature ideas: a "domain comparison winner" with a detailed rationale (not just price), a "Pi wallet balance" integration into the domain cards (show a "you can afford this" badge), a newsletter archive section, a testimonial submission flow, an animated "Pi mining simulator" widget, and a "domain acquisition funnel" stepper (browse → favorite → compare → offer → connect wallet).
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 9
+Agent: main (Z.ai Code) — webDevReview cron round 8
+Task: QA the existing site, then add new features (Pi mining simulator, affordability badges, full-page lights-off) and improve styling.
+
+Work Log:
+- Reviewed worklog (Task IDs 1–8) — site had 11 sections with domain health score, lights-off toggle, glossary in article bodies, stat flash, domain deep-link, domain of the week, animated count-up, blog SectionHeader, favorites, recently viewed, wallet balance in offer modal, social share, wallet connect, section numbering, glossary triggers, comparison winner, domain comparison, glossary, blog comments, tip-of-day, calculator disclaimer, command palette, scroll-spy, make-offer modal, market chart, pioneer spotlight, ecosystem pulse, starfield, 3D card tilt, back-to-top.
+- QA via agent-browser: page loaded clean, no console/runtime errors; dev log clean. Lint clean. All 11 sections present.
+
+New features added (all on the single / route, per the "only / route" constraint):
+1. Pi mining simulator (src/components/pi/mining-simulator.tsx):
+   - An interactive "tap to mine" widget that simulates the daily Pi mining session.
+   - States: ready ("Tap to mine" button) → mining (animated pickaxe wiggle + progress bar over 3s) → earned (spring check icon + "+X.XXXX π" + next-session countdown) → cooldown (clock icon + live countdown timer).
+   - Earns ~2.88–3.38 π per session (base rate 0.12 π/hr * 24h + random bonus).
+   - 24-hour cooldown between sessions, persisted to localStorage (lastMined, totalMined, sessions count).
+   - Live countdown ticks every second; lifetime stats (total mined, sessions) shown in a 2-col footer.
+   - Placed as the first column of the calculator section (now a 3-col grid: mining | converter | tip-of-day).
+2. "You can afford this" badge on domain cards (domain-portfolio.tsx):
+   - DomainCard now uses the useWalletState hook to reactively read the connected wallet's balance.
+   - When a wallet is connected and a domain has a price, a small badge appears under the price: green "✓ Affordable" (if balance >= price) or rose "Over budget" (if balance < price).
+   - Reactively updates on wallet connect/disconnect via the custom event broadcast.
+3. Full-page lights-off focus mode (lights-off-toggle.tsx + globals.css):
+   - The lights-off toggle now dims both the hero (radial gradient overlay) AND the entire page body (`.lights-off-page` class).
+   - Full-page mode: all direct children of body (except the header and the hero) get opacity 0.35 + a 0.5px blur, with a 0.6s transition; hovering restores full opacity.
+   - Creates a cinematic "focus mode" where the hero stands out and the rest of the page recedes.
+
+Styling improvements:
+- Mining simulator: animated pickaxe wiggle, gradient progress bar, spring check icon on success, countdown timer, 2-col lifetime stats footer.
+- Affordability badges: conditional teal/rose tinting with uppercase tracking.
+- Full-page focus mode: smooth opacity + blur transitions with hover-to-reveal.
+- Calculator section restructured: 3-col grid (mining | converter | tip) with a centered "Try the math" recap banner below.
+
+Verification (agent-browser):
+- Page reloads clean; no console/runtime errors; all 11 sections present.
+- Mining simulator: "Pi mining simulator" heading + "Tap to mine" button rendered → clicked → animated mining (pickaxe wiggle + progress bar) → after 3s showed "Mined +3.0427 π" + "Next session in" countdown → lifetime stats (Total mined: 3.0427 π, Sessions: 1). Verified localStorage: {"lastMined":1790986678680,"totalMined":3.0427,"sessions":1}.
+- Affordability badges: connected kinyanjui.pi wallet (1,247.83 π) → all 7 priced domains show "Over budget" badges (all prices > 1,247.83 π). Verified via DOM: 7 "Over budget" spans found. Badges reactively appeared on wallet connect without page reload.
+- Full-page lights-off: clicked "Turn lights off" → hero got `.lights-off` class AND body got `.lights-off-page` class (verified: `heroLightsOff: true, pageFocus: true`). Clicked again → both classes removed.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 3 new features: Pi mining simulator (interactive daily mining demo with cooldown + localStorage), affordability badges on domain cards (reactive to wallet state), full-page lights-off focus mode.
+- 1 new component: MiningSimulator.
+- 1 new CSS utility: .lights-off-page (full-page dim + hover-to-reveal).
+- Calculator section restructured to a 3-col grid (mining | converter | tip).
+- All features QA-verified end-to-end via agent-browser; lint clean; no runtime errors; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The mining simulator's earnings are illustrative; could add a "security circle bonus" multiplier (more pioneers in your circle = higher rate).
+- The affordability badge compares against asking price only; a "best offer" flow could let users set a custom offer amount and check affordability against that.
+- The full-page lights-off dims everything except the header+hero; the ScrollProgress bar and BackToTop FAB are also dimmed — could exclude fixed elements.
+- Next-step feature ideas: a "domain acquisition funnel" stepper (browse → favorite → compare → offer → connect wallet), a "Pi wallet balance" integration into the mining sim (mine → see balance grow), a newsletter archive section, a testimonial submission flow, a "domain recommendation engine" (suggest domains based on wallet balance + interests), and an animated "Pi ecosystem map" visualization.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
