@@ -710,3 +710,50 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - kenyan.pi is a strong regional play; could add a "regional hubs" section or a Kenya-specific spotlight.
 - Next-step feature ideas: a "domain claim status" checklist (track which domains are claimed/connected vs pending), a per-domain "connect to wallet" CTA, a newsletter article about the December deadline, and a "claim all" reminder flow.
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 13
+Agent: main (Z.ai Code) — user request: secure 5 owned domains before deadline
+Task: Build a Domain Claim Tracker to help the user claim + connect all 5 owned .pi domains before the December deadline.
+
+Work Log:
+- User asked for help getting all 5 of their owned .pi domains online on the Pi Network to avoid losing them before the December deadline.
+- Clarified the 5 owned domains: kinyanjui.pi, pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi.
+- Important clarification: this website is a showcase — it CANNOT directly claim/connect domains on the Pi blockchain. That must be done in the Pi Browser app. The tracker is a progress checklist + step-by-step guide.
+- Built a ClaimTracker component (src/components/pi/claim-tracker.tsx):
+  - Lists the 5 owned domains with a 3-state status tracker: Pending → Claimed → Connected.
+  - Status persisted to localStorage ("kinyanjui-pi-claim-status") with cross-component event sync.
+  - Progress summary: X/5 connected, claimed count, not-started count, days-left badge (tied to Dec 31, 2026 deadline).
+  - Animated gradient progress bar (claimed = 50%, connected = 100% per domain).
+  - Each domain row expands to show 2 steps: (1) Claim — "Open the Pi Browser → Domains → find your domain → tap Claim", (2) Connect wallet — "link your Pi wallet address so the domain resolves on-chain".
+  - Each step has an "Open Pi Browser" external link (https://minepi.com/pi-browser, opens new tab) + a "Mark as done" button.
+  - Completed steps show a teal check + "✓ Completed". Toast on status change.
+  - Reset option per domain. Footer disclaimer clarifies the tracker doesn't claim anything on-chain.
+  - Status icons + badges: Pending (rose circle), Claimed (gold shield), Connected (teal check).
+- Placed the ClaimTracker prominently right after the TickerTape (high on the page, immediately visible).
+- Added "Claim Tracker" to the command palette (2nd option, ShieldCheck icon) so users can jump to it via ⌘K.
+
+Verification (agent-browser):
+- Page loads clean; no console/runtime errors.
+- Scrolled to #claim → "Claim & connect your 5 .pi domains" heading + all 5 domains listed (kinyanjui.pi, pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi) each "Pending".
+- Progress summary: 0/5 connected, 0 claimed, 5 not started, days-left badge.
+- Expanded kinyanjui.pi → 2 steps (Claim + Connect wallet) with "Open Pi Browser" link (https://minepi.com/pi-browser) + "Mark as done" buttons.
+- Clicked "Mark as done" on Claim → status updated to "Claimed — connect your wallet next" + gold badge + toast "kinyanjui.pi claimed — Now connect your Pi wallet to finish."
+- Progress updated: 0/5 connected, 1 claimed, 4 not started.
+- localStorage verified: {"kinyanjui.pi":"claimed"} persisted.
+- Command palette: "Claim Tracker #claim" appears as the 2nd option.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 1 new component: ClaimTracker — a domain-by-domain claim/connect progress tracker for the user's 5 owned domains, with step-by-step Pi Browser instructions, localStorage persistence, progress bar, and deadline urgency.
+- Added to the command palette.
+- Placed prominently high on the page.
+- All features QA-verified via agent-browser; lint clean; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The tracker is browser-local (localStorage); if the user clears their browser data, progress is lost. Could add an optional account-backed sync later.
+- The "Open Pi Browser" link goes to minepi.com/pi-browser (the download page); if Pi has a direct deep-link to the Domains section, that would be better.
+- The 5 owned domains are hardcoded in the component; if the user acquires more, update OWNED_DOMAINS in claim-tracker.tsx.
+- Next-step feature ideas: per-domain "claim history" timeline, email/SMS reminder when the deadline approaches, a "claim all" batch flow guide, and integration with the Pi Browser deep-link protocol once available.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.

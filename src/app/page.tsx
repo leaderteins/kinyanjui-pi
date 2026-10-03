@@ -27,6 +27,7 @@ import { RecommendationEngine } from "@/components/pi/recommendation-engine";
 import { AcquisitionFunnel } from "@/components/pi/acquisition-funnel";
 import { EcosystemMap } from "@/components/pi/ecosystem-map";
 import { DeadlineBanner } from "@/components/pi/deadline-banner";
+import { ClaimTracker } from "@/components/pi/claim-tracker";
 
 async function getInitialData() {
   try {
@@ -92,6 +93,7 @@ export default async function Home() {
       <main className="flex-1">
         <Hero domainsCount={domainsCount} />
         <TickerTape />
+        <ClaimTracker />
         <Stats domainsCount={domainsCount} />
         <AcquisitionFunnel />
         <DomainPortfolio />

@@ -26,20 +26,24 @@ import {
   ArrowUp,
   DollarSign,
   ShoppingCart,
+  ShieldCheck,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const SECTIONS = [
   { id: "top", label: "Top", icon: Home, hint: "Home" },
+  { id: "claim", label: "Claim Tracker", icon: ShieldCheck, hint: "Secure your domains" },
   { id: "portfolio", label: "Domains", icon: Tag, hint: "Portfolio" },
   { id: "market", label: "Market", icon: DollarSign, hint: "Chart" },
   { id: "calculator", label: "Pi Converter", icon: Calculator, hint: "Calc" },
   { id: "about", label: "About Pi", icon: Sparkles, hint: "About" },
   { id: "services", label: "Use Cases", icon: ShoppingCart, hint: "Services" },
+  { id: "ecosystem", label: "Ecosystem Map", icon: Sparkles, hint: "Map" },
   { id: "pioneers", label: "Pioneers", icon: Sparkles, hint: "Voices" },
   { id: "blog", label: "News", icon: Newspaper, hint: "Dispatch" },
   { id: "roadmap", label: "Roadmap", icon: Sparkles, hint: "Timeline" },
   { id: "pulse", label: "Pulse", icon: Search, hint: "Activity" },
+  { id: "recommend", label: "Recommendations", icon: Sparkles, hint: "Picks" },
   { id: "faq", label: "FAQ", icon: HelpCircle, hint: "Help" },
   { id: "contact", label: "Contact", icon: Mail, hint: "Get in touch" },
 ];
