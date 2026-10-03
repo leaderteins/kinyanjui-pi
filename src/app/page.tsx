@@ -26,6 +26,7 @@ import { MiningSimulator } from "@/components/pi/mining-simulator";
 import { RecommendationEngine } from "@/components/pi/recommendation-engine";
 import { AcquisitionFunnel } from "@/components/pi/acquisition-funnel";
 import { EcosystemMap } from "@/components/pi/ecosystem-map";
+import { DeadlineBanner } from "@/components/pi/deadline-banner";
 
 async function getInitialData() {
   try {
@@ -87,8 +88,9 @@ export default async function Home() {
     <div className="flex min-h-screen flex-col">
       <ScrollProgress />
       <Navbar />
+      <DeadlineBanner />
       <main className="flex-1">
-        <Hero />
+        <Hero domainsCount={domainsCount} />
         <TickerTape />
         <Stats domainsCount={domainsCount} />
         <AcquisitionFunnel />

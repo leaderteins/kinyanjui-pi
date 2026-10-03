@@ -23,7 +23,7 @@ interface LookupResult {
   emoji?: string;
 }
 
-export function Hero() {
+export function Hero({ domainsCount = 12 }: { domainsCount?: number }) {
   const [query, setQuery] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<LookupResult | null>(null);
@@ -179,7 +179,7 @@ export function Hero() {
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Globe2 className="h-4 w-4 text-pi-purple" />
-                8 curated domains
+                {domainsCount} curated domains
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-pi-teal" />

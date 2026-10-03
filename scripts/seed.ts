@@ -105,6 +105,58 @@ const domains = [
     emoji: "🔄",
     accent: "gold",
   },
+  {
+    name: "pimorgages.pi",
+    label: "pimorgages",
+    tagline: "Pi-backed mortgages — own your home, settle in Pi",
+    description:
+      "pimorgages.pi is envisioned as a Pi-native mortgage and real-estate financing platform. Pioneers could pledge Pi holdings toward home loans, track amortization on-chain, and settle monthly payments in Pi — bringing decentralized finance to the biggest purchase most people will ever make.",
+    category: "defi",
+    status: "held",
+    pricePi: 12000,
+    featured: true,
+    emoji: "🏦",
+    accent: "gold",
+  },
+  {
+    name: "pimorgage.pi",
+    label: "pimorgage",
+    tagline: "The singular Pi mortgage hub",
+    description:
+      "pimorgage.pi is the flagship singular form of the mortgages concept — a focused landing for a single Pi-backed mortgage product. Ideal as the consumer-facing brand while pimorgages.pi handles the platform infrastructure. A paired domain strategy protects the brand on both singular and plural forms.",
+    category: "defi",
+    status: "held",
+    pricePi: 8800,
+    featured: false,
+    emoji: "🏠",
+    accent: "purple",
+  },
+  {
+    name: "pidapps.pi",
+    label: "pidapps",
+    tagline: "Decentralized apps, built natively on Pi",
+    description:
+      "pidapps.pi is positioned as a discovery layer and registry for decentralized applications (dApps) running on the Pi blockchain. Developers list their dApps; pioneers browse by category, install with one tap, and connect their Pi wallet to start using on-chain services instantly.",
+    category: "utility",
+    status: "held",
+    pricePi: 6400,
+    featured: true,
+    emoji: "⚡",
+    accent: "teal",
+  },
+  {
+    name: "kenyan.pi",
+    label: "kenyan",
+    tagline: "The Pi identity for Kenya's pioneer community",
+    description:
+      "kenyan.pi is a regional identity domain anchoring the Kenyan Pi pioneer community. Planned as a hub for local meetups, Kiswahili content, M-Pesa↔Pi on/off ramps, and a directory of Kenyan merchants accepting Pi. Kenya is one of Pi's most active markets — this name gives it a home.",
+    category: "community",
+    status: "held",
+    pricePi: 5200,
+    featured: true,
+    emoji: "🇰🇪",
+    accent: "rose",
+  },
 ];
 
 async function main() {

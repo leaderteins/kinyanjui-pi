@@ -667,3 +667,46 @@ Unresolved issues or risks, and priority recommendations for the next phase:
 - The ecosystem map could be made clickable (clicking a node opens the domain detail dialog).
 - Next-step feature ideas: a newsletter archive section, a testimonial submission flow, a "Pi glossary" full-page reference, a domain acquisition history timeline (per-user), an animated "Pi blockchain" block explorer demo, and a "domain investment calculator" (project returns based on views/growth).
 - The recurring webDevReview cron (every 15 min) will continue advancing the project.
+
+---
+Task ID: 12
+Agent: main (Z.ai Code) — user-reported new domains + December deadline
+Task: Add the user's 4 new .pi domains (pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi) to the portfolio and build a December Pi domain claim/connect deadline countdown banner.
+
+Work Log:
+- User reported owning 4 additional .pi domains: pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi — and noted Pi has a December deadline to have each domain claimed/connected.
+- Reviewed the seed script and added the 4 new domains with full metadata (tagline, description, category, status, price, emoji, accent):
+  - pimorgages.pi (🏦, DeFi, $12,000 π, featured) — Pi-backed mortgages platform.
+  - pimorgage.pi (🏠, DeFi, $8,800 π) — singular mortgage hub, paired brand strategy.
+  - pidapps.pi (⚡, Utility, $6,400 π, featured) — dApp discovery + registry.
+  - kenyan.pi (🇰🇪, Community, $5,200 π, featured) — Kenyan pioneer community hub (M-Pesa↔Pi, Kiswahili content).
+- Re-ran the seed: 12 domains total now (was 8).
+- Made the Hero "curated domains" count dynamic (passed domainsCount prop from the server component) so it now shows "12 curated domains" instead of the hardcoded "8".
+- Built a DeadlineBanner component:
+  - A sticky top banner below the navbar showing the Pi domain claim/connect deadline (December 31, 2026 — adjusted to the sandbox's Oct 2026 clock so the countdown is live).
+  - Live countdown: days : hrs : min : sec, ticking every second.
+  - Urgent state (≤30 days): rose-tinted with "deadline approaching". Expired state: teal with "deadline has passed". Normal: gold.
+  - "Have each .pi domain claimed or connected by December 31, 2026 — the Pi Network cutoff."
+  - Dismissible (persists to localStorage) with an X button + "View domains" CTA.
+  - Animated entrance/exit via framer-motion AnimatePresence.
+
+Verification (agent-browser):
+- API: GET /api/domains?category=all returns 12 domains; all 4 new names confirmed present.
+- Portfolio grid: scrolled to #portfolio → all 4 new domain cards render (pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi) with their emojis, headings, and "View details" buttons.
+- Hero: shows "12 curated domains" (dynamic, was hardcoded "8").
+- Deadline banner: "Pi domain claim/connect deadline" + "Have each .pi domain claimed or connected by December 31, 2026 — the Pi Network cutoff." + live countdown showing 89 days, 15 hrs, 05 min, 51 sec (correct for Oct 3 → Dec 31). DAYS/HRS labels visible.
+- Mobile (iPhone 14): screenshot taken, layout holds, no errors.
+- Lint: `bun run lint` clean.
+
+Stage Summary:
+- 4 new domains added to the portfolio (pimorgages.pi, pimorgage.pi, pidapps.pi, kenyan.pi) — total now 12.
+- Hero domain count made dynamic.
+- New DeadlineBanner component with live countdown + dismissible + urgent/expired states.
+- All features QA-verified via agent-browser; lint clean; mobile responsive.
+
+Unresolved issues or risks, and priority recommendations for the next phase:
+- The deadline date (Dec 31, 2026) is hardcoded based on the sandbox clock; if the real Pi deadline differs, update DEADLINE in deadline-banner.tsx.
+- The 4 new domains are all "held" status; could mark some as "for-sale" or "developed" as the user clarifies intent.
+- kenyan.pi is a strong regional play; could add a "regional hubs" section or a Kenya-specific spotlight.
+- Next-step feature ideas: a "domain claim status" checklist (track which domains are claimed/connected vs pending), a per-domain "connect to wallet" CTA, a newsletter article about the December deadline, and a "claim all" reminder flow.
+- The recurring webDevReview cron (every 15 min) will continue advancing the project.
