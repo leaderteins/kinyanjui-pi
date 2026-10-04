@@ -29,6 +29,7 @@ import { EcosystemMap } from "@/components/pi/ecosystem-map";
 import { DeadlineBanner } from "@/components/pi/deadline-banner";
 import { ClaimTracker } from "@/components/pi/claim-tracker";
 import { DomainConnectionGuide } from "@/components/pi/domain-connection-guide";
+import { ConnectAllDomains } from "@/components/pi/connect-all-domains";
 
 async function getInitialData() {
   try {
@@ -95,6 +96,7 @@ export default async function Home() {
         <Hero domainsCount={domainsCount} />
         <TickerTape />
         <ClaimTracker />
+        <ConnectAllDomains />
         <DomainConnectionGuide />
         <Stats domainsCount={domainsCount} />
         <AcquisitionFunnel />
